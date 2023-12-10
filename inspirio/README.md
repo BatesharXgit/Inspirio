@@ -1,4 +1,4 @@
-# inspirio
+# quotes_tales
 
 A new Flutter project.
 

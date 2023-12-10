@@ -1,6 +1,6 @@
 {
-    "name": "inspirio",
-    "short_name": "inspirio",
+    "name": "quotes_tales",
+    "short_name": "quotes_tales",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
