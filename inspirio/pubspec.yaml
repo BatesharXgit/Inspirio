@@ -37,6 +37,7 @@ dependencies:
   bootstrap_icons: ^1.11.1
   image_picker: ^1.0.4
   firebase_app_check: ^0.2.1+2
+  chips_choice: ^3.0.1
   rename: ^3.0.1
 
 dev_dependencies:

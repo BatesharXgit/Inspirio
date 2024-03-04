@@ -4,7 +4,6 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/widgets.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:get/get.dart';
@@ -88,19 +87,45 @@ void savetoGallery(BuildContext context) async {
 
 final FirebaseStorage storage = FirebaseStorage.instance;
 final Reference foryouRef = FirebaseStorage.instance.ref().child('home/foryou');
+final Reference popularRef =
+    FirebaseStorage.instance.ref().child('home/popular');
+final Reference hindiRef = FirebaseStorage.instance.ref().child('home/hindi');
+final Reference morningRef =
+    FirebaseStorage.instance.ref().child('home/morning');
+final Reference motivationalRef =
+    FirebaseStorage.instance.ref().child('home/motivational');
+final Reference attitudeRef =
+    FirebaseStorage.instance.ref().child('home/attitude');
 
 List<Reference> foryouRefs = [];
+List<Reference> popularRefs = [];
+List<Reference> hindiRefs = [];
+List<Reference> morningRefs = [];
+List<Reference> motivationalRefs = [];
+List<Reference> attitudeRefs = [];
 
-class InspirioHomeNew extends StatefulWidget {
-  const InspirioHomeNew({Key? key}) : super(key: key);
+class InspirioHome extends StatefulWidget {
+  const InspirioHome({Key? key}) : super(key: key);
 
   @override
-  State<InspirioHomeNew> createState() => InspirioHomeNewState();
+  State<InspirioHome> createState() => InspirioHomeState();
 }
 
-class InspirioHomeNewState extends State<InspirioHomeNew> {
+class InspirioHomeState extends State<InspirioHome>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
   late SharedPreferences _prefs;
   List<String> favoriteImages = [];
+
+  final List<String> data = [
+    "For You",
+    "Popular",
+    'Hindi',
+    'Morning',
+    "Motivational",
+    "Attitude",
+  ];
 
   @override
   void initState() {
@@ -109,7 +134,13 @@ class InspirioHomeNewState extends State<InspirioHomeNew> {
     _createBannerAd();
     _createInterstitialAd();
     loadNativeAd();
+    _tabController = TabController(length: 6, vsync: this);
     refreshForYouImages();
+    refreshPopularImages();
+    refreshHindiImages();
+    refreshMorningImages();
+    refreshMotivationalImages();
+    refreshAttitudeImages();
     isImageLoaded = true;
   }
 
@@ -210,7 +241,7 @@ class InspirioHomeNewState extends State<InspirioHomeNew> {
 
   @override
   void dispose() {
-    // _tabController.dispose();
+    _tabController.dispose();
     super.dispose();
   }
 
@@ -224,6 +255,64 @@ class InspirioHomeNewState extends State<InspirioHomeNew> {
       });
     }
   }
+
+  Future<void> refreshPopularImages() async {
+    final ListResult result2 = await popularRef.listAll();
+    final List<Reference> shuffledpopularRefs = result2.items.toList()
+      ..shuffle();
+    if (mounted) {
+      setState(() {
+        popularRefs = shuffledpopularRefs;
+      });
+    }
+  }
+
+  Future<void> refreshHindiImages() async {
+    final ListResult result3 = await hindiRef.listAll();
+    final List<Reference> shuffledhindiRefs = result3.items.toList()..shuffle();
+    if (mounted) {
+      setState(() {
+        hindiRefs = shuffledhindiRefs;
+      });
+    }
+  }
+
+  Future<void> refreshMorningImages() async {
+    final ListResult result4 = await morningRef.listAll();
+    final List<Reference> shuffledmorningRefs = result4.items.toList()
+      ..shuffle();
+    if (mounted) {
+      setState(() {
+        morningRefs = shuffledmorningRefs;
+      });
+    }
+  }
+
+  Future<void> refreshMotivationalImages() async {
+    final ListResult result6 = await motivationalRef.listAll();
+    final List<Reference> shuffledmotivationalRefs = result6.items.toList()
+      ..shuffle();
+    if (mounted) {
+      setState(() {
+        motivationalRefs = shuffledmotivationalRefs;
+      });
+    }
+  }
+
+  Future<void> refreshAttitudeImages() async {
+    final ListResult result8 = await attitudeRef.listAll();
+    final List<Reference> shuffledattitudeRefs = result8.items.toList()
+      ..shuffle();
+    if (mounted) {
+      setState(() {
+        attitudeRefs = shuffledattitudeRefs;
+      });
+    }
+  }
+
+  //banner Ads
+  //native Ad
+  //Interstitial Ad
 
   @override
   Widget build(BuildContext context) {
@@ -251,69 +340,91 @@ class InspirioHomeNewState extends State<InspirioHomeNew> {
                 return const SplashScreen();
               } else {
                 return SafeArea(
-                  child: Column(
-                    children: [
-                      Container(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .background
-                            .withOpacity(0.5),
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Inspirio',
-                                style: GoogleFonts.cookie(
-                                  // fontFamily: 'Anurati',
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
-                                  fontSize: 44,
-                                  // fontWeight: FontWeight.bold,
+                  child: NestedScrollView(
+                    controller: ScrollController(),
+                    headerSliverBuilder: (context, innerBoxIsScrolled) {
+                      return <Widget>[
+                        SliverAppBar(
+                          expandedHeight:
+                              MediaQuery.of(context).size.height * 0.1,
+                          floating: true,
+                          pinned: false,
+                          elevation: 0,
+                          backgroundColor:
+                              Theme.of(context).colorScheme.background,
+                          flexibleSpace: FlexibleSpaceBar(
+                            centerTitle: false,
+                            title: null,
+                            background: Container(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .background
+                                  .withOpacity(0.5),
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Inspirio',
+                                      style: GoogleFonts.cookie(
+                                        // fontFamily: 'Anurati',
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .secondary,
+                                        fontSize: 44,
+                                        // fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        IconButton(
+                                          icon: Icon(
+                                            Iconsax.heart,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .secondary,
+                                            size: 28,
+                                          ),
+                                          onPressed: () => Get.to(
+                                            const FavouritesQuotesPage(),
+                                            transition:
+                                                Transition.rightToLeftWithFade,
+                                          ),
+                                        ),
+                                        IconButton(
+                                          icon: Icon(
+                                            Iconsax.setting,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .secondary,
+                                            size: 28,
+                                          ),
+                                          onPressed: () => Get.to(
+                                            const SettingsPage(),
+                                            transition:
+                                                Transition.leftToRightWithFade,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
                               ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  IconButton(
-                                    icon: Icon(
-                                      Iconsax.heart,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .secondary,
-                                      size: 28,
-                                    ),
-                                    onPressed: () => Get.to(
-                                      const FavouritesQuotesPage(),
-                                      transition:
-                                          Transition.rightToLeftWithFade,
-                                    ),
-                                  ),
-                                  IconButton(
-                                    icon: Icon(
-                                      Iconsax.setting,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .secondary,
-                                      size: 28,
-                                    ),
-                                    onPressed: () => Get.to(
-                                      const SettingsPage(),
-                                      transition:
-                                          Transition.leftToRightWithFade,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
-                      Text("For You"),
-                      Expanded(child: _buildForYouTab()),
-                    ],
+                        SliverPersistentHeader(
+                          pinned: true,
+                          delegate: _SliverAppBarDelegate(_buildTabBar()),
+                        ),
+                      ];
+                    },
+                    body: _buildTabViews(),
                   ),
                 );
               }
@@ -389,6 +500,72 @@ class InspirioHomeNewState extends State<InspirioHomeNew> {
     );
   }
 
+  Widget _buildTabBar() {
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        Color primaryColour = themeProvider.themeData.colorScheme.primary;
+        return Container(
+          height: 100,
+          color: themeProvider.themeData.colorScheme.background,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(10, 2, 0, 2),
+            child: TabBar(
+              dividerColor: Colors.transparent,
+              tabAlignment: TabAlignment.start,
+              physics: const BouncingScrollPhysics(),
+              indicatorPadding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
+              controller: _tabController,
+              indicatorColor: themeProvider.themeData.colorScheme.secondary,
+              indicator: BoxDecoration(
+                color: themeProvider.themeData.colorScheme.secondary,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              labelColor: primaryColour,
+              unselectedLabelColor: primaryColour,
+              isScrollable: true,
+              labelPadding: const EdgeInsets.symmetric(horizontal: 5),
+              tabs: data.map((tab) {
+                return Container(
+                  height: MediaQuery.of(context).size.height * 0.046,
+                  width: MediaQuery.of(context).size.width * 0.25,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                        width: 2.0,
+                        color: themeProvider.themeData.colorScheme.secondary),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Tab(
+                    child: Text(
+                      tab,
+                      style: GoogleFonts.kanit(
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildTabViews() {
+    return TabBarView(
+      controller: _tabController,
+      physics: const BouncingScrollPhysics(),
+      children: [
+        _buildForYouTab(),
+        _buildPopularTab(),
+        _buildHindiTab(),
+        _buildMorningTab(),
+        _buildMotivationalTab(),
+        _buildAttitudeTab(),
+      ],
+    );
+  }
+
   Widget _buildForYouTab() {
     Color backgroundColour = Theme.of(context).colorScheme.background;
     Color primaryColour = Theme.of(context).colorScheme.primary;
@@ -431,6 +608,253 @@ class InspirioHomeNewState extends State<InspirioHomeNew> {
       ),
     );
   }
+
+  Widget _buildPopularTab() {
+    Color backgroundColour = Theme.of(context).colorScheme.background;
+    Color primaryColour = Theme.of(context).colorScheme.primary;
+    return RefreshIndicator(
+      backgroundColor: backgroundColour,
+      color: primaryColour,
+      onRefresh: refreshPopularImages,
+      child: CustomScrollView(
+        slivers: <Widget>[
+          SliverGrid(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.75,
+            ),
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext context, int index) {
+                if (index % 10 == 0 && index > 0) {
+                  return _buildNativeAdWidget();
+                } else {
+                  final popularIndex = index - (index ~/ 10);
+                  if (popularIndex < popularRefs.length) {
+                    final pl = popularRefs[popularIndex];
+                    return FutureBuilder<String>(
+                      future: pl.getDownloadURL(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Components.buildPlaceholder();
+                        } else if (snapshot.hasError) {
+                          return Components.buildErrorWidget();
+                        } else if (snapshot.hasData) {
+                          return _buildImageWidget(snapshot.data!);
+                        } else {
+                          return Container();
+                        }
+                      },
+                    );
+                  } else {
+                    return const SizedBox.shrink();
+                  }
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHindiTab() {
+    Color backgroundColour = Theme.of(context).colorScheme.background;
+    Color primaryColour = Theme.of(context).colorScheme.primary;
+    return RefreshIndicator(
+      backgroundColor: backgroundColour,
+      color: primaryColour,
+      onRefresh: refreshHindiImages,
+      child: CustomScrollView(
+        slivers: <Widget>[
+          SliverGrid(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.75,
+            ),
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext context, int index) {
+                if (index % 10 == 0 && index > 0) {
+                  return _buildNativeAdWidget();
+                } else {
+                  final hindiIndex = index - (index ~/ 10);
+                  if (hindiIndex < hindiRefs.length) {
+                    final hi = hindiRefs[hindiIndex];
+                    return FutureBuilder<String>(
+                      future: hi.getDownloadURL(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Components.buildPlaceholder();
+                        } else if (snapshot.hasError) {
+                          return Components.buildErrorWidget();
+                        } else if (snapshot.hasData) {
+                          return _buildImageWidget(snapshot.data!);
+                        } else {
+                          return Container();
+                        }
+                      },
+                    );
+                  } else {
+                    return const SizedBox.shrink();
+                  }
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMorningTab() {
+    return RefreshIndicator(
+      onRefresh: refreshMorningImages,
+      child: CustomScrollView(
+        slivers: <Widget>[
+          SliverGrid(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.75,
+            ),
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext context, int index) {
+                if (index % 10 == 0 && index > 0) {
+                  return _buildNativeAdWidget();
+                } else {
+                  final morningIndex = index - (index ~/ 10);
+                  if (morningIndex < morningRefs.length) {
+                    final mr = morningRefs[morningIndex];
+                    return FutureBuilder<String>(
+                      future: mr.getDownloadURL(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Components.buildPlaceholder();
+                        } else if (snapshot.hasError) {
+                          return Components.buildErrorWidget();
+                        } else if (snapshot.hasData) {
+                          return _buildImageWidget(snapshot.data!);
+                        } else {
+                          return Container();
+                        }
+                      },
+                    );
+                  } else {
+                    return const SizedBox.shrink();
+                  }
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  // else {
+  //   return const Center(child: Text('No images available'));
+  // }
+
+  Widget _buildMotivationalTab() {
+    Color backgroundColour = Theme.of(context).colorScheme.background;
+    Color primaryColour = Theme.of(context).colorScheme.primary;
+    return RefreshIndicator(
+      backgroundColor: backgroundColour,
+      color: primaryColour,
+      onRefresh: refreshMotivationalImages,
+      child: CustomScrollView(
+        slivers: <Widget>[
+          SliverGrid(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.75,
+            ),
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext context, int index) {
+                if (index % 10 == 0 && index > 0) {
+                  return _buildNativeAdWidget();
+                } else {
+                  final motivationalIndex = index - (index ~/ 10);
+                  if (motivationalIndex < motivationalRefs.length) {
+                    final mo = motivationalRefs[motivationalIndex];
+                    return FutureBuilder<String>(
+                      future: mo.getDownloadURL(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Components.buildPlaceholder();
+                        } else if (snapshot.hasError) {
+                          return Components.buildErrorWidget();
+                        } else if (snapshot.hasData) {
+                          return _buildImageWidget(snapshot.data!);
+                        } else {
+                          return Container();
+                        }
+                      },
+                    );
+                  } else {
+                    return const SizedBox.shrink();
+                  }
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAttitudeTab() {
+    Color backgroundColour = Theme.of(context).colorScheme.background;
+    Color primaryColour = Theme.of(context).colorScheme.primary;
+    return RefreshIndicator(
+      backgroundColor: backgroundColour,
+      color: primaryColour,
+      onRefresh: refreshAttitudeImages,
+      child: CustomScrollView(
+        slivers: <Widget>[
+          SliverGrid(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.75,
+            ),
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext context, int index) {
+                if (index % 10 == 0 && index > 0) {
+                  return _buildNativeAdWidget();
+                } else {
+                  final attitudeIndex = index - (index ~/ 10);
+                  if (attitudeIndex < attitudeRefs.length) {
+                    final at = attitudeRefs[attitudeIndex];
+                    return FutureBuilder<String>(
+                      future: at.getDownloadURL(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Components.buildPlaceholder();
+                        } else if (snapshot.hasError) {
+                          return Components.buildErrorWidget();
+                        } else if (snapshot.hasData) {
+                          return _buildImageWidget(snapshot.data!);
+                        } else {
+                          return Container();
+                        }
+                      },
+                    );
+                  } else {
+                    return const SizedBox.shrink();
+                  }
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  // else {
+  //   return const Center(child: Text('No images available'));
+  // }
 
   Widget _buildImageWidget(String imageUrl) {
     return Consumer<ThemeProvider>(
@@ -617,9 +1041,55 @@ class SplashScreen extends StatelessWidget {
                 ),
               ),
             ),
+            // Positioned(
+            //   bottom: 50,
+            //   left: 0,
+            //   right: 0,
+            //   child: Align(
+            //     alignment: Alignment.center,
+            //     child: Text(
+            //       'Inspirio',
+            //       style: GoogleFonts.orbitron(
+            //         // fontFamily: 'Anurati',
+            //         color: Theme.of(context).colorScheme.secondary,
+            //         fontSize: 30,
+            //         fontWeight: FontWeight.bold,
+            //       ),
+            //     ),
+            //   ),
+
+            //  LoadingAnimationWidget.threeArchedCircle(
+            //   size: 50,
+            //   color: Colors.red,
+            //   // leftDotColor: Colors.red,
+            //   // rightDotColor: Colors.white,
+            // ),
+            // ),
           ],
         ),
       ),
     );
+  }
+}
+
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  final Widget tab;
+
+  _SliverAppBarDelegate(this.tab);
+
+  @override
+  double get minExtent => 50;
+  @override
+  double get maxExtent => 50;
+
+  @override
+  bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) {
+    return false;
+  }
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return tab;
   }
 }
