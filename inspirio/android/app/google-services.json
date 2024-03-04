@@ -14,19 +14,64 @@
       },
       "oauth_client": [
         {
-          "client_id": "973397429352-3qdbtrtv3hvrjnv7tv14hcv2cj3nj4qk.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.application.inspirio",
-            "certificate_hash": "5f53bd758f9f3982bc7dd209a7e508eee4d3b26f"
-          }
-        },
-        {
           "client_id": "973397429352-77qn7n9u832j2k677b47p07sn9p81cld.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.application.inspirio",
             "certificate_hash": "762dad8480e7decb8162c2758bdf9e613e95b742"
+          }
+        },
+        {
+          "client_id": "973397429352-le6ml3p587mad3g2l3sjnqaq1bclren6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.application.inspirio",
+            "certificate_hash": "9c32fe1ca1a06825711a3c6c41891bddcf3740a6"
+          }
+        },
+        {
+          "client_id": "973397429352-vaqki0okbkj1nvk33h41t90005npnd8c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.application.inspirio",
+            "certificate_hash": "0da602b7ed9f09136fa4fd32157c0038798677e1"
+          }
+        },
+        {
+          "client_id": "973397429352-q8o63p79jtp7ssghn7quqc6rvc5u45ut.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyByvBbWZsDw2C38egRPouDmtm_GEv7n2MI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "973397429352-q8o63p79jtp7ssghn7quqc6rvc5u45ut.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:973397429352:android:eab679d5578d1886527fdd",
+        "android_client_info": {
+          "package_name": "com.xd.inspirio"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "973397429352-dtus0vnes7iap2fpm33nbh8fh00st9l9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.xd.inspirio",
+            "certificate_hash": "0da602b7ed9f09136fa4fd32157c0038798677e1"
           }
         },
         {
