@@ -92,17 +92,6 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
-// ignore: non_constant_identifier_names
-  final Uri _url_upload = Uri.parse(
-      'https://docs.google.com/forms/d/e/1FAIpQLSdcRk51cQ2wrTY9-PJUnd1v9gg1idiv0FluUA-xpf6jezai1g/viewform?usp=sf_link');
-
-// ignore: non_constant_identifier_names
-  Future<void> _launchUrl_upload() async {
-    if (!await launchUrl(_url_upload)) {
-      throw Exception('Could not launch $_url_upload');
-    }
-  }
-
   bool showThemeOptions = false;
 
   @override
@@ -154,7 +143,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     ],
                   ),
                 const SizedBox(
-                  height: 10,
+                  height: 50,
                 ),
                 Container(
                   margin: const EdgeInsets.fromLTRB(20, 8, 20, 0),
@@ -242,46 +231,6 @@ class _SettingsPageState extends State<SettingsPage> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: ListTile(
-                    leading: const Icon(Iconsax.info_circle),
-                    title: const Text('App Information'),
-                    iconColor: secondaryColour,
-                    textColor: secondaryColour,
-                    trailing: const Icon(Iconsax.arrow_right),
-                    onTap: () {
-                      return showAboutDialog(
-                        context: context,
-                        applicationName: 'Inspirio',
-                        applicationVersion: '1.5.0',
-                        applicationIcon: const Icon(Icons.info_outline),
-                        applicationLegalese: '© 2023 Inspirio by XD.',
-                      );
-                    },
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.fromLTRB(20, 8, 20, 0),
-                  decoration: BoxDecoration(
-                    color: primaryColour.withOpacity(0.6),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: ListTile(
-                    leading: const Icon(Iconsax.share),
-                    title: const Text('Share your Creativity'),
-                    iconColor: secondaryColour,
-                    textColor: secondaryColour,
-                    trailing: const Icon(Iconsax.arrow_right),
-                    onTap: () {
-                      _launchUrl_upload();
-                    },
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.fromLTRB(20, 8, 20, 0),
-                  decoration: BoxDecoration(
-                    color: primaryColour.withOpacity(0.6),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: ListTile(
                     leading: const Icon(Icons.bug_report_outlined),
                     title: const Text('Report a Bug'),
                     iconColor: secondaryColour,
@@ -325,10 +274,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
                 const SizedBox(
-                  height: 10,
-                ),
-                const SizedBox(
-                  height: 10,
+                  height: 50,
                 ),
                 Text(
                   'Contact Us On:',

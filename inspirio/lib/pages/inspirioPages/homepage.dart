@@ -12,6 +12,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:inspirio/components/widgets.dart';
+import 'package:inspirio/creator/creator_photo.dart';
 import 'package:inspirio/pages/inspirioPages/category.dart';
 import 'package:inspirio/pages/inspirioPages/creator.dart';
 import 'package:inspirio/pages/inspirioPages/pages.dart';
@@ -949,6 +950,22 @@ class InspirioHomeState extends State<InspirioHome>
                       bottom: 10.0,
                       child: Row(
                         children: [
+                          FloatingActionButton(
+                            backgroundColor: primaryColour,
+                            onPressed: () {
+                              Get.to(
+                                 InspirioEditor(imageUrl: imageUrl,),
+                              );
+                              Navigator.pop(context);
+                            },
+                            child: Icon(
+                              Iconsax.pen_add,
+                              color: Theme.of(context).colorScheme.secondary,
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
                           FloatingActionButton(
                             backgroundColor: primaryColour,
                             onPressed: () {
