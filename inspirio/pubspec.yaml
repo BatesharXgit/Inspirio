@@ -39,6 +39,7 @@ dependencies:
   firebase_app_check: ^0.2.1+2
   chips_choice: ^3.0.1
   rename: ^3.0.1
+  palette_generator: ^0.3.3+3
 
 dev_dependencies:
   flutter_test:

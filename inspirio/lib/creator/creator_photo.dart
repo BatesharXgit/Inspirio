@@ -18,8 +18,8 @@ import 'package:inspirio/components/widgets.dart';
 import 'package:inspirio/services/admob_services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:ui' as ui;
-
 import 'package:share/share.dart';
+import 'package:palette_generator/palette_generator.dart';
 
 late TabController _tabController;
 bool isGalleryImage = false;
@@ -118,12 +118,14 @@ class InspirioEditorState extends State<InspirioEditor>
       ValueNotifier<String?>(null);
   bool _isBackPressed = false;
   File? pickedImageFile;
+  Color? dominantColor;
 
   @override
   void initState() {
     super.initState();
     _createBannerAd();
     _createInterstitialAd();
+    _loadDominantColor();
     _tabController = TabController(length: data.length, vsync: this);
     // AdProvider adProvider = Provider.of<AdProvider>(context, listen: false);
     // adProvider.initializeFullPageAds();
@@ -171,6 +173,15 @@ class InspirioEditorState extends State<InspirioEditor>
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadDominantColor() async {
+    final PaletteGenerator paletteGenerator =
+        await PaletteGenerator.fromImageProvider(
+            CachedNetworkImageProvider(widget.imageUrl));
+    setState(() {
+      dominantColor = paletteGenerator.dominantColor?.color;
+    });
   }
 
   void _addImageToStack(String imageUrl) {
@@ -333,6 +344,7 @@ class InspirioEditorState extends State<InspirioEditor>
                       selectedImageUrlNotifier: selectedImageUrlNotifier,
                       onImageSelected: _addImageToStack,
                       pickedImageFile: pickedImageFile,
+                      dominantColour: dominantColor,
                     ),
                   ],
                 ),
@@ -574,56 +586,10 @@ class InspirioEditorState extends State<InspirioEditor>
                   },
                 );
               },
-              child: const Text('Pick a color for Quote'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColour,
-                elevation: 10,
-                shadowColor: primaryColour,
+              child: Text(
+                'Pick a color',
+                style: GoogleFonts.kanit(color: backgroundColour),
               ),
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      backgroundColor: backgroundColour,
-                      title: Text(
-                        'Pick a color',
-                        style: GoogleFonts.kanit(color: primaryColour),
-                      ),
-                      content: SingleChildScrollView(
-                        child: MaterialColorPicker(
-                          alignment: WrapAlignment.spaceEvenly,
-                          runAlignment: WrapAlignment.center,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          selectedColor: selectedWriterColor,
-                          onColorChange: (colorWriter) {
-                            setState(() {
-                              selectedWriterColor = colorWriter;
-                            });
-                          },
-                          onMainColorChange: (colorWriter) {
-                            setState(() {
-                              selectedWriterColor = colorWriter as Color;
-                            });
-                          },
-                        ),
-                      ),
-                      actions: <Widget>[
-                        IconButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          icon: const Icon(Icons.done),
-                          color: primaryColour,
-                        )
-                      ],
-                    );
-                  },
-                );
-              },
-              child: const Text('Pick a color for Writer'),
             ),
           ],
         ),
@@ -637,6 +603,7 @@ class ImageStack extends StatefulWidget {
   final ValueNotifier<String?> selectedImageUrlNotifier;
   final Function(String) onImageSelected;
   final File? pickedImageFile;
+  final Color? dominantColour;
 
   const ImageStack({
     Key? key,
@@ -644,6 +611,7 @@ class ImageStack extends StatefulWidget {
     required this.selectedImageUrlNotifier,
     required this.onImageSelected,
     this.pickedImageFile,
+    this.dominantColour,
   }) : super(key: key);
 
   @override
@@ -688,8 +656,8 @@ class ImageStackState extends State<ImageStack> {
                   Container(
                     height: 80,
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                    ),
+                        color: widget.dominantColour,
+                        border: Border.all(width: 4, color: Colors.white)),
                     width: MediaQuery.of(context).size.width * 0.95,
                   ),
                 ],
@@ -753,7 +721,7 @@ class ImageStackState extends State<ImageStack> {
                               hintStyle: TextStyle(color: primaryColour),
                               border: InputBorder.none,
                             ),
-                            maxLines: null,
+                            maxLines: 1,
                             cursorWidth: 2,
                             cursorColor: primaryColour,
                           ),
