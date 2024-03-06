@@ -8,7 +8,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:inspirio/components/widgets.dart';
-import 'package:inspirio/pages/inspirioPages/pages.dart';
+import 'package:inspirio/pages/pages.dart';
 import 'package:inspirio/services/admob_services.dart';
 // import 'package:google_mobile_ads/google_mobile_ads.dart';
 // import 'package:inspirio/services/ad_provider.dart';

@@ -5,7 +5,7 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:inspirio/pages/inspirioPages/pages.dart';
+import 'package:inspirio/pages/pages.dart';
 import 'package:inspirio/services/admob_services.dart';
 
 final FirebaseStorage storage = FirebaseStorage.instance;
@@ -400,85 +400,128 @@ class CategoryState extends State<Category> {
 void _navigateToCategoryPage(String category) {
   switch (category) {
     case 'Morning':
-      Get.to(() => const MorningPage(),
+      Get.to(
+          () => const CategoryPage(
+                reference: 'home/morning',
+              ),
           transition: Transition.leftToRightWithFade);
       break;
     case 'Night':
-      Get.to(() => const NightPage(),
+      Get.to(
+          () => const CategoryPage(
+                reference: 'category/night',
+              ),
           transition: Transition.rightToLeftWithFade);
       break;
     case 'Birthday':
-      Get.to(() => const BirthdayPage(),
+      Get.to(
+          () => const CategoryPage(
+                reference: 'category/birthday',
+              ),
           transition: Transition.leftToRightWithFade);
       break;
     case 'Inspirational':
-      Get.to(() => const InspirationalPage(),
+      Get.to(() => const CategoryPage(
+                reference: "category/inspirational",
+              ),
           transition: Transition.rightToLeftWithFade);
       break;
     case 'Religious':
-      Get.to(() => const ReligiousPage(),
+      Get.to(() => const CategoryPage(
+                reference: "category/religious",
+              ),
           transition: Transition.leftToRightWithFade);
       break;
     case 'Leadership':
-      Get.to(() => const LeadershipPage(),
+      Get.to(() => const CategoryPage(
+                reference: "category/leadership",
+              ),
           transition: Transition.rightToLeftWithFade);
       break;
     case 'Avengers':
-      Get.to(() => const AvengersPage(),
+      Get.to(() => const CategoryPage(
+                reference: "category/avengers",
+              ),
           transition: Transition.leftToRightWithFade);
       break;
     case 'Happiness':
-      Get.to(() => const HappinessPage(),
+      Get.to(() => const CategoryPage(
+                reference: "category/happiness",
+              ),
           transition: Transition.rightToLeftWithFade);
       break;
     case 'Movies':
-      Get.to(() => const MoviesPage(),
+      Get.to(() => const CategoryPage(
+                reference: "category/movies",
+              ),
           transition: Transition.leftToRightWithFade);
       break;
     case 'Hindi':
-      Get.to(() => const HindiPage(),
+      Get.to(() => const CategoryPage(
+                reference: "home/hindi",
+              ),
           transition: Transition.rightToLeftWithFade);
       break;
     case 'Best Wishes':
-      Get.to(() => const WishesPage(),
+      Get.to(() => const CategoryPage(
+                reference: "category/bestwishes",
+              ),
           transition: Transition.leftToRightWithFade);
       break;
     case 'Friendship':
-      Get.to(() => const FriendshipPage(),
+      Get.to(() => const CategoryPage(
+                reference: "category/friendship",
+              ),
           transition: Transition.rightToLeftWithFade);
       break;
 
     case 'Success':
-      Get.to(() => const SuccessPage(),
+      Get.to(() => const CategoryPage(
+                reference: "category/success",
+              ),
           transition: Transition.leftToRightWithFade);
       break;
     case 'Motivational':
-      Get.to(() => const MotivationalPage(),
+      Get.to(() => const CategoryPage(
+                reference: "home/motivational",
+              ),
           transition: Transition.rightToLeftWithFade);
       break;
 
     case 'Fitness':
-      Get.to(() => const FitnessPage(),
+      Get.to(() => const CategoryPage(
+                reference: "category/fitness",
+              ),
           transition: Transition.leftToRightWithFade);
       break;
     case 'Nature':
-      Get.to(() => const NaturePage(),
+      Get.to(() => const CategoryPage(
+                reference: "category/nature",
+              ),
           transition: Transition.rightToLeftWithFade);
       break;
     case 'Courage':
-      Get.to(() => const CouragePage(),
+      Get.to(() => const CategoryPage(
+                reference: "category/courage",
+              ),
           transition: Transition.leftToRightWithFade);
       break;
     case 'Business':
-      Get.to(() => const BusinessPage(),
+      Get.to(() => const CategoryPage(
+                reference: "category/business",
+              ),
           transition: Transition.rightToLeftWithFade);
       break;
     case 'Power':
-      Get.to(() => const PowerPage(),
+      Get.to(() => const CategoryPage(
+                reference: "category/power",
+              ),
           transition: Transition.leftToRightWithFade);
       break;
     case 'Wisdom':
-      Get.to(() => const WisdomPage(),
+      Get.to(() => const CategoryPage(
+                reference: "category/wisdom",
+              ),
           transition: Transition.rightToLeftWithFade);
       break;
     default:
