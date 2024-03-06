@@ -234,6 +234,11 @@ class CategoryPageState extends State<CategoryPage>
   Widget build(BuildContext context) {
     Color backgroundColour = Theme.of(context).colorScheme.background;
     Color secondaryColour = Theme.of(context).colorScheme.secondary;
+
+    String categoryTitle = widget.reference.split('/').last;
+    categoryTitle = categoryTitle.substring(0, 1).toUpperCase() +
+        categoryTitle.substring(1);
+
     return Scaffold(
       bottomNavigationBar: _banner == null
           ? const SizedBox(
@@ -248,7 +253,7 @@ class CategoryPageState extends State<CategoryPage>
         elevation: 8,
         backgroundColor: backgroundColour,
         title: Text(
-          'Morning',
+          categoryTitle,
           style: GoogleFonts.kanit(
             color: secondaryColour,
             fontSize: 22,
