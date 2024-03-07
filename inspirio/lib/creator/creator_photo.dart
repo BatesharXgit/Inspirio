@@ -679,10 +679,15 @@ class ImageStackState extends State<ImageStack> {
                       bottom: 2,
                       left: 20,
                       child: Container(
-                        padding: EdgeInsets.all(20),
+                        padding: EdgeInsets.all(24),
                         margin: EdgeInsets.fromLTRB(0, 0, 0, 8),
                         decoration: BoxDecoration(
-                            color: Colors.black, shape: BoxShape.circle),
+                            color: Colors.black,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              width: 2,
+                              color: Colors.white,
+                            )),
                         child: Icon(
                           Icons.person,
                           size: 42,

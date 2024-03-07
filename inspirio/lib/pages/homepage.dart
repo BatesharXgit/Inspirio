@@ -975,30 +975,6 @@ class SplashScreen extends StatelessWidget {
                 ),
               ),
             ),
-            // Positioned(
-            //   bottom: 50,
-            //   left: 0,
-            //   right: 0,
-            //   child: Align(
-            //     alignment: Alignment.center,
-            //     child: Text(
-            //       'Inspirio',
-            //       style: GoogleFonts.orbitron(
-            //         // fontFamily: 'Anurati',
-            //         color: Theme.of(context).colorScheme.secondary,
-            //         fontSize: 30,
-            //         fontWeight: FontWeight.bold,
-            //       ),
-            //     ),
-            //   ),
-
-            //  LoadingAnimationWidget.threeArchedCircle(
-            //   size: 50,
-            //   color: Colors.red,
-            //   // leftDotColor: Colors.red,
-            //   // rightDotColor: Colors.white,
-            // ),
-            // ),
           ],
         ),
       ),

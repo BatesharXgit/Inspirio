@@ -92,14 +92,14 @@ final List<String> poeters = [
   'Pablo Neruda',
 ];
 
-final List<String> poetersImages = [
-  'gs://inspirio-hyperlink.appspot.com/poetersimg/william.jpeg',
-  'gs://inspirio-hyperlink.appspot.com/poetersimg/rabindernath.jpg',
-  'gs://inspirio-hyperlink.appspot.com/poetersimg/gulzar.jpg',
-  'gs://inspirio-hyperlink.appspot.com/poetersimg/emily.webp',
-  'gs://inspirio-hyperlink.appspot.com/poetersimg/mirza.jpg',
-  'gs://inspirio-hyperlink.appspot.com/poetersimg/robert.jpg',
-  'gs://inspirio-hyperlink.appspot.com/poetersimg/pablo.jpeg'
+List<String> poetersImages = [
+  'https://firebasestorage.googleapis.com/v0/b/inspirio-xd.appspot.com/o/poetersimg%2Fwilliam.jpeg?alt=media&token=4b1102b5-fe1b-4dad-9729-3aaf90f43a71',
+  'https://firebasestorage.googleapis.com/v0/b/inspirio-xd.appspot.com/o/poetersimg%2Frabindernath.jpg?alt=media&token=01bfaba8-00bd-4a6d-bbf4-e29b8aebf7bb',
+  'https://firebasestorage.googleapis.com/v0/b/inspirio-xd.appspot.com/o/poetersimg%2Fgulzar.jpg?alt=media&token=7050e0fb-2c6e-4686-b503-62561e579f1b',
+  'https://firebasestorage.googleapis.com/v0/b/inspirio-xd.appspot.com/o/poetersimg%2Femily.webp?alt=media&token=9e972a47-9a13-4dad-9c42-db8f529998d9',
+  'https://firebasestorage.googleapis.com/v0/b/inspirio-xd.appspot.com/o/poetersimg%2Fmirza.jpg?alt=media&token=5ac7988c-fb8d-45fc-a272-bc7866e84b7c',
+  'https://firebasestorage.googleapis.com/v0/b/inspirio-xd.appspot.com/o/poetersimg%2Frobert.jpg?alt=media&token=c303696b-231c-4c7a-a53f-cbd77d7ff0ea',
+  'https://firebasestorage.googleapis.com/v0/b/inspirio-xd.appspot.com/o/poetersimg%2Fpablo.jpeg?alt=media&token=ee226e81-c77f-4c77-a937-a554f4338b39',
 ];
 
 class PoetryPage extends StatefulWidget {
@@ -239,14 +239,6 @@ class PoetryPageState extends State<PoetryPage>
     Color backgroundColour = Theme.of(context).colorScheme.background;
     Color primaryColour = Theme.of(context).colorScheme.primary;
     return Scaffold(
-      bottomNavigationBar: _banner == null
-          ? const SizedBox(
-              height: 0,
-            )
-          : SizedBox(
-              height: 52,
-              child: AdWidget(ad: _banner!),
-            ),
       appBar: AppBar(
         // centerTitle: true,
         backgroundColor: backgroundColour,
@@ -293,20 +285,13 @@ class PoetryPageState extends State<PoetryPage>
   Widget _buildPoetersTab() {
     Color primaryColour = Theme.of(context).colorScheme.primary;
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.17,
+      height: MediaQuery.of(context).size.height * 0.18,
       child: ListView.builder(
         physics: const BouncingScrollPhysics(),
         scrollDirection: Axis.horizontal,
         itemCount: poetersImages.length,
         itemBuilder: (BuildContext context, int index) {
           final category = poeters[index];
-
-          Future<String> getImageUrl() async {
-            final Reference ref =
-                FirebaseStorage.instance.refFromURL(poetersImages[index]);
-            final String downloadURL = await ref.getDownloadURL();
-            return downloadURL;
-          }
 
           return AnimationConfiguration.staggeredList(
             position: index,
@@ -329,32 +314,20 @@ class PoetryPageState extends State<PoetryPage>
                                 color: primaryColour.withOpacity(0.5)),
                             borderRadius: BorderRadius.circular(50),
                           ),
-                          child: FutureBuilder(
-                            future: getImageUrl(),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return const SizedBox();
-                              }
-                              if (snapshot.hasError) {
-                                return const Text('Error loading image');
-                              }
-                              final imageUrl = snapshot.data.toString();
-                              return Container(
-                                height: 80,
-                                width: 80,
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    fit: BoxFit.cover,
-                                    image: NetworkImage(imageUrl),
-                                  ),
-                                  border: Border.all(
-                                      width: 3.5,
-                                      color: primaryColour.withOpacity(0.5)),
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
-                              );
-                            },
+                          child: Container(
+                            height: 80,
+                            width: 80,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                fit: BoxFit.cover,
+                                image: CachedNetworkImageProvider(
+                                    poetersImages[index]),
+                              ),
+                              border: Border.all(
+                                  width: 3.5,
+                                  color: primaryColour.withOpacity(0.5)),
+                              borderRadius: BorderRadius.circular(50),
+                            ),
                           ),
                         ),
                         onTap: () {
@@ -398,8 +371,8 @@ class PoetryPageState extends State<PoetryPage>
           slivers: <Widget>[
             SliverGrid(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 1,
-                childAspectRatio: 0.8,
+                crossAxisCount: 2,
+                childAspectRatio: 0.75,
               ),
               delegate: SliverChildBuilderDelegate(
                 (BuildContext context, int index) {
@@ -448,7 +421,7 @@ class PoetryPageState extends State<PoetryPage>
           _showFullScreenImage(imageUrl, heroTag);
         },
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: EdgeInsets.all(4.0),
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8.0),
