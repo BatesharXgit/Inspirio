@@ -21,7 +21,6 @@ dependencies:
   cached_network_image: ^3.2.3
   google_fonts: ^4.0.4
   flutter_material_color_picker: ^1.2.0
-  card_swiper: ^2.0.4
   google_nav_bar: ^5.0.6
   flutter_floating_bottom_bar: ^1.1.0
   firebase_auth: ^4.7.2
@@ -37,7 +36,6 @@ dependencies:
   bootstrap_icons: ^1.11.1
   image_picker: ^1.0.4
   firebase_app_check: ^0.2.1+2
-  chips_choice: ^3.0.1
   rename: ^3.0.1
   palette_generator: ^0.3.3+3
 

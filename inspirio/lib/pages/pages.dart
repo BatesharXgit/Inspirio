@@ -1,20 +1,22 @@
-import 'dart:math';
 import 'dart:ui' as ui;
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
-import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:inspirio/components/widgets.dart';
+import 'package:inspirio/creator/creator_photo.dart';
 import 'package:inspirio/services/admob_services.dart';
+import 'package:inspirio/util/theme_provider.dart';
 // import 'package:google_mobile_ads/google_mobile_ads.dart';
 // import 'package:inspirio/services/ad_provider.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 // import 'package:provider/provider.dart';
 import 'package:share/share.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -122,12 +124,6 @@ Future<void> shareQuotes(String imageUrl) async {
     // ignore: empty_catches
   } catch (e) {}
 }
-
-//================================================================================================================================================================
-//================================================================================================================================================================
-//===========================================            Morning Page              ==================================================================
-//================================================================================================================================================================
-//================================================================================================================================================================
 
 class CategoryPage extends StatefulWidget {
   final String reference;
@@ -275,8 +271,8 @@ class CategoryPageState extends State<CategoryPage>
                     SliverGrid(
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 1,
-                        childAspectRatio: 0.8,
+                        crossAxisCount: 2,
+                        childAspectRatio: 0.75,
                       ),
                       delegate: SliverChildBuilderDelegate(
                         (BuildContext context, int index) {
@@ -319,51 +315,57 @@ class CategoryPageState extends State<CategoryPage>
   }
 
   Widget _buildImageWidget(String imageUrl) {
-    Color primaryColour = Theme.of(context).colorScheme.primary;
-    final heroTag = 'image_hero_$imageUrl';
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        Color primaryColour = themeProvider.themeData.colorScheme.primary;
+        final heroTag = 'image_hero_$imageUrl';
 
-    return Hero(
-      tag: heroTag,
-      child: GestureDetector(
-        onTap: () {
-          _showFullScreenImage(imageUrl, heroTag);
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.0),
-              boxShadow: [
-                BoxShadow(
-                  color: primaryColour.withOpacity(0.2),
-                  blurRadius: 10,
-                  offset: const Offset(0, 0),
+        return Hero(
+          tag: heroTag,
+          child: GestureDetector(
+            onTap: () {
+              _showFullScreenImage(imageUrl, heroTag, themeProvider);
+            },
+            child: Padding(
+              padding: EdgeInsets.all(4.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: primaryColour.withOpacity(0.2),
+                      blurRadius: 1,
+                      offset: const Offset(0, 0),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
-              child: CachedNetworkImage(
-                fadeInDuration: const Duration(milliseconds: 100),
-                fadeOutDuration: const Duration(milliseconds: 100),
-                imageUrl: imageUrl,
-                placeholder: (context, url) => Components.buildPlaceholder(),
-                errorWidget: (context, url, error) =>
-                    Components.buildErrorWidget(),
-                fit: BoxFit.cover,
-                cacheManager: DefaultCacheManager(),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8.0),
+                  child: CachedNetworkImage(
+                    fadeInDuration: const Duration(milliseconds: 100),
+                    fadeOutDuration: const Duration(milliseconds: 100),
+                    imageUrl: imageUrl,
+                    placeholder: (context, url) =>
+                        Components.buildPlaceholder(),
+                    errorWidget: (context, url, error) =>
+                        Components.buildErrorWidget(),
+                    fit: BoxFit.cover,
+                    cacheManager: DefaultCacheManager(),
+                  ),
+                ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
-  void _showFullScreenImage(String imageUrl, String heroTag) {
-    Color backgroundColour = Theme.of(context).colorScheme.background;
-    Color primaryColour = Theme.of(context).colorScheme.primary;
-    Color secondaryColour = Theme.of(context).colorScheme.secondary;
+  void _showFullScreenImage(
+      String imageUrl, String heroTag, ThemeProvider themeProvider) {
+    Color backgroundColour = themeProvider.themeData.colorScheme.background;
+    Color primaryColour = themeProvider.themeData.colorScheme.primary;
+    Color secondaryColour = themeProvider.themeData.colorScheme.secondary;
 
     Navigator.of(context).push(
       PageRouteBuilder(
@@ -378,11 +380,6 @@ class CategoryPageState extends State<CategoryPage>
                     Navigator.of(context).pop();
                   }
                 },
-                // onVerticalDragStart: (details) {
-                //   if (details.! > 0) {
-                //     Navigator.of(context).pop();
-                //   }
-                // },
                 child: Stack(
                   children: [
                     Container(
@@ -410,6 +407,24 @@ class CategoryPageState extends State<CategoryPage>
                       bottom: 10.0,
                       child: Row(
                         children: [
+                          FloatingActionButton(
+                            backgroundColor: primaryColour,
+                            onPressed: () {
+                              Navigator.pop(context);
+                              Get.to(
+                                InspirioEditor(
+                                  imageUrl: imageUrl,
+                                ),
+                              );
+                            },
+                            child: Icon(
+                              Iconsax.pen_add,
+                              color: Theme.of(context).colorScheme.secondary,
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
                           FloatingActionButton(
                             backgroundColor: primaryColour,
                             onPressed: () {
@@ -455,7 +470,6 @@ class CategoryPageState extends State<CategoryPage>
                             onPressed: () {
                               _showInterstitialAd();
                               shareQuotes(imageUrl);
-                              ();
                             },
                             heroTag: 3,
                             icon: Icon(

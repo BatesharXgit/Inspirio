@@ -15,7 +15,6 @@ import 'package:inspirio/components/widgets.dart';
 import 'package:inspirio/creator/creator_photo.dart';
 import 'package:inspirio/pages/category.dart';
 import 'package:inspirio/creator/creator.dart';
-import 'package:inspirio/pages/pages.dart';
 import 'package:inspirio/pages/poetry.dart';
 import 'package:inspirio/services/admob_services.dart';
 import 'package:inspirio/util/favourites.dart';
@@ -132,9 +131,7 @@ class InspirioHomeState extends State<InspirioHome>
   void initState() {
     super.initState();
     _loadFavoriteImages();
-    _createBannerAd();
     _createInterstitialAd();
-    loadNativeAd();
     _tabController = TabController(length: 6, vsync: this);
     refreshForYouImages();
     refreshPopularImages();
@@ -145,16 +142,7 @@ class InspirioHomeState extends State<InspirioHome>
     isImageLoaded = true;
   }
 
-  BannerAd? _banner;
   InterstitialAd? _interstitialAd;
-  void _createBannerAd() {
-    _banner = BannerAd(
-      size: AdSize.banner,
-      adUnitId: AdMobService.bannerAdUnitId!,
-      listener: AdMobService.bannerListener,
-      request: const AdRequest(),
-    )..load();
-  }
 
   void _createInterstitialAd() {
     InterstitialAd.load(
@@ -180,43 +168,6 @@ class InspirioHomeState extends State<InspirioHome>
       );
       _interstitialAd!.show();
       _interstitialAd = null;
-    }
-  }
-
-  NativeAd? _nativeAd;
-  bool _nativeAdIsLoaded = false;
-
-  void loadNativeAd() {
-    _nativeAd = NativeAd(
-        adUnitId: AdMobService.nativeAdsUnit!,
-        listener: NativeAdListener(
-          onAdLoaded: (ad) {
-            setState(() {
-              _nativeAdIsLoaded = true;
-            });
-          },
-          onAdFailedToLoad: (ad, error) {
-            ad.dispose();
-          },
-          onAdClicked: (ad) {},
-          onAdImpression: (ad) {},
-          onAdClosed: (ad) {},
-          onAdOpened: (ad) {},
-          onAdWillDismissScreen: (ad) {},
-          onPaidEvent: (ad, valueMicros, precision, currencyCode) {},
-        ),
-        request: const AdRequest(),
-        nativeTemplateStyle:
-            NativeTemplateStyle(templateType: TemplateType.medium),
-        customOptions: {});
-    _nativeAd?.load();
-  }
-
-  Widget _buildNativeAdWidget() {
-    if (_nativeAdIsLoaded) {
-      return NativeAdWidget(_nativeAd!);
-    } else {
-      return Container();
     }
   }
 
@@ -325,14 +276,6 @@ class InspirioHomeState extends State<InspirioHome>
         return Scaffold(
           key: _scaffoldKey,
           appBar: null,
-          bottomNavigationBar: _banner == null
-              ? const SizedBox(
-                  height: 0,
-                )
-              : SizedBox(
-                  height: 52,
-                  child: AdWidget(ad: _banner!),
-                ),
           backgroundColor: backgroundColour,
           body: FutureBuilder<ListResult>(
             future: foryouRef.listAll(),
@@ -408,7 +351,7 @@ class InspirioHomeState extends State<InspirioHome>
                                           onPressed: () => Get.to(
                                             const SettingsPage(),
                                             transition:
-                                                Transition.leftToRightWithFade,
+                                                Transition.rightToLeftWithFade,
                                           ),
                                         ),
                                       ],
@@ -624,35 +567,29 @@ class InspirioHomeState extends State<InspirioHome>
               crossAxisCount: 2,
               childAspectRatio: 0.75,
             ),
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                if (index % 10 == 0 && index > 0) {
-                  return _buildNativeAdWidget();
-                } else {
-                  final popularIndex = index - (index ~/ 10);
-                  if (popularIndex < popularRefs.length) {
-                    final pl = popularRefs[popularIndex];
-                    return FutureBuilder<String>(
-                      future: pl.getDownloadURL(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Components.buildPlaceholder();
-                        } else if (snapshot.hasError) {
-                          return Components.buildErrorWidget();
-                        } else if (snapshot.hasData) {
-                          return _buildImageWidget(snapshot.data!);
-                        } else {
-                          return Container();
-                        }
-                      },
-                    );
-                  } else {
-                    return const SizedBox.shrink();
-                  }
-                }
-              },
-            ),
+            delegate:
+                SliverChildBuilderDelegate((BuildContext context, int index) {
+              final popularIndex = index - (index ~/ 10);
+              if (popularIndex < popularRefs.length) {
+                final pl = popularRefs[popularIndex];
+                return FutureBuilder<String>(
+                  future: pl.getDownloadURL(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Components.buildPlaceholder();
+                    } else if (snapshot.hasError) {
+                      return Components.buildErrorWidget();
+                    } else if (snapshot.hasData) {
+                      return _buildImageWidget(snapshot.data!);
+                    } else {
+                      return Container();
+                    }
+                  },
+                );
+              } else {
+                return const SizedBox.shrink();
+              }
+            }),
           ),
         ],
       ),
@@ -673,35 +610,29 @@ class InspirioHomeState extends State<InspirioHome>
               crossAxisCount: 2,
               childAspectRatio: 0.75,
             ),
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                if (index % 10 == 0 && index > 0) {
-                  return _buildNativeAdWidget();
-                } else {
-                  final hindiIndex = index - (index ~/ 10);
-                  if (hindiIndex < hindiRefs.length) {
-                    final hi = hindiRefs[hindiIndex];
-                    return FutureBuilder<String>(
-                      future: hi.getDownloadURL(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Components.buildPlaceholder();
-                        } else if (snapshot.hasError) {
-                          return Components.buildErrorWidget();
-                        } else if (snapshot.hasData) {
-                          return _buildImageWidget(snapshot.data!);
-                        } else {
-                          return Container();
-                        }
-                      },
-                    );
-                  } else {
-                    return const SizedBox.shrink();
-                  }
-                }
-              },
-            ),
+            delegate:
+                SliverChildBuilderDelegate((BuildContext context, int index) {
+              final hindiIndex = index - (index ~/ 10);
+              if (hindiIndex < hindiRefs.length) {
+                final hi = hindiRefs[hindiIndex];
+                return FutureBuilder<String>(
+                  future: hi.getDownloadURL(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Components.buildPlaceholder();
+                    } else if (snapshot.hasError) {
+                      return Components.buildErrorWidget();
+                    } else if (snapshot.hasData) {
+                      return _buildImageWidget(snapshot.data!);
+                    } else {
+                      return Container();
+                    }
+                  },
+                );
+              } else {
+                return const SizedBox.shrink();
+              }
+            }),
           ),
         ],
       ),
@@ -718,35 +649,29 @@ class InspirioHomeState extends State<InspirioHome>
               crossAxisCount: 2,
               childAspectRatio: 0.75,
             ),
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                if (index % 10 == 0 && index > 0) {
-                  return _buildNativeAdWidget();
-                } else {
-                  final morningIndex = index - (index ~/ 10);
-                  if (morningIndex < morningRefs.length) {
-                    final mr = morningRefs[morningIndex];
-                    return FutureBuilder<String>(
-                      future: mr.getDownloadURL(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Components.buildPlaceholder();
-                        } else if (snapshot.hasError) {
-                          return Components.buildErrorWidget();
-                        } else if (snapshot.hasData) {
-                          return _buildImageWidget(snapshot.data!);
-                        } else {
-                          return Container();
-                        }
-                      },
-                    );
-                  } else {
-                    return const SizedBox.shrink();
-                  }
-                }
-              },
-            ),
+            delegate:
+                SliverChildBuilderDelegate((BuildContext context, int index) {
+              final morningIndex = index - (index ~/ 10);
+              if (morningIndex < morningRefs.length) {
+                final mr = morningRefs[morningIndex];
+                return FutureBuilder<String>(
+                  future: mr.getDownloadURL(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Components.buildPlaceholder();
+                    } else if (snapshot.hasError) {
+                      return Components.buildErrorWidget();
+                    } else if (snapshot.hasData) {
+                      return _buildImageWidget(snapshot.data!);
+                    } else {
+                      return Container();
+                    }
+                  },
+                );
+              } else {
+                return const SizedBox.shrink();
+              }
+            }),
           ),
         ],
       ),
@@ -772,30 +697,25 @@ class InspirioHomeState extends State<InspirioHome>
             ),
             delegate: SliverChildBuilderDelegate(
               (BuildContext context, int index) {
-                if (index % 10 == 0 && index > 0) {
-                  return _buildNativeAdWidget();
+                final motivationalIndex = index - (index ~/ 10);
+                if (motivationalIndex < motivationalRefs.length) {
+                  final mo = motivationalRefs[motivationalIndex];
+                  return FutureBuilder<String>(
+                    future: mo.getDownloadURL(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Components.buildPlaceholder();
+                      } else if (snapshot.hasError) {
+                        return Components.buildErrorWidget();
+                      } else if (snapshot.hasData) {
+                        return _buildImageWidget(snapshot.data!);
+                      } else {
+                        return Container();
+                      }
+                    },
+                  );
                 } else {
-                  final motivationalIndex = index - (index ~/ 10);
-                  if (motivationalIndex < motivationalRefs.length) {
-                    final mo = motivationalRefs[motivationalIndex];
-                    return FutureBuilder<String>(
-                      future: mo.getDownloadURL(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Components.buildPlaceholder();
-                        } else if (snapshot.hasError) {
-                          return Components.buildErrorWidget();
-                        } else if (snapshot.hasData) {
-                          return _buildImageWidget(snapshot.data!);
-                        } else {
-                          return Container();
-                        }
-                      },
-                    );
-                  } else {
-                    return const SizedBox.shrink();
-                  }
+                  return const SizedBox.shrink();
                 }
               },
             ),
@@ -821,30 +741,25 @@ class InspirioHomeState extends State<InspirioHome>
             ),
             delegate: SliverChildBuilderDelegate(
               (BuildContext context, int index) {
-                if (index % 10 == 0 && index > 0) {
-                  return _buildNativeAdWidget();
+                final attitudeIndex = index - (index ~/ 10);
+                if (attitudeIndex < attitudeRefs.length) {
+                  final at = attitudeRefs[attitudeIndex];
+                  return FutureBuilder<String>(
+                    future: at.getDownloadURL(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Components.buildPlaceholder();
+                      } else if (snapshot.hasError) {
+                        return Components.buildErrorWidget();
+                      } else if (snapshot.hasData) {
+                        return _buildImageWidget(snapshot.data!);
+                      } else {
+                        return Container();
+                      }
+                    },
+                  );
                 } else {
-                  final attitudeIndex = index - (index ~/ 10);
-                  if (attitudeIndex < attitudeRefs.length) {
-                    final at = attitudeRefs[attitudeIndex];
-                    return FutureBuilder<String>(
-                      future: at.getDownloadURL(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Components.buildPlaceholder();
-                        } else if (snapshot.hasError) {
-                          return Components.buildErrorWidget();
-                        } else if (snapshot.hasData) {
-                          return _buildImageWidget(snapshot.data!);
-                        } else {
-                          return Container();
-                        }
-                      },
-                    );
-                  } else {
-                    return const SizedBox.shrink();
-                  }
+                  return const SizedBox.shrink();
                 }
               },
             ),
@@ -954,7 +869,9 @@ class InspirioHomeState extends State<InspirioHome>
                             backgroundColor: primaryColour,
                             onPressed: () {
                               Get.to(
-                                 InspirioEditor(imageUrl: imageUrl,),
+                                InspirioEditor(
+                                  imageUrl: imageUrl,
+                                ),
                               );
                               Navigator.pop(context);
                             },

@@ -131,7 +131,7 @@ class CategoryState extends State<Category> {
         iconTheme: Theme.of(context).iconTheme,
         elevation: 0,
         title: Text(
-          "Browse",
+          "Browse Categories",
           style: GoogleFonts.kanit(
             fontSize: 22,
             color: secondaryColour,
@@ -421,105 +421,122 @@ void _navigateToCategoryPage(String category) {
           transition: Transition.leftToRightWithFade);
       break;
     case 'Inspirational':
-      Get.to(() => const CategoryPage(
+      Get.to(
+          () => const CategoryPage(
                 reference: "category/inspirational",
               ),
           transition: Transition.rightToLeftWithFade);
       break;
     case 'Religious':
-      Get.to(() => const CategoryPage(
+      Get.to(
+          () => const CategoryPage(
                 reference: "category/religious",
               ),
           transition: Transition.leftToRightWithFade);
       break;
     case 'Leadership':
-      Get.to(() => const CategoryPage(
+      Get.to(
+          () => const CategoryPage(
                 reference: "category/leadership",
               ),
           transition: Transition.rightToLeftWithFade);
       break;
     case 'Avengers':
-      Get.to(() => const CategoryPage(
+      Get.to(
+          () => const CategoryPage(
                 reference: "category/avengers",
               ),
           transition: Transition.leftToRightWithFade);
       break;
     case 'Happiness':
-      Get.to(() => const CategoryPage(
+      Get.to(
+          () => const CategoryPage(
                 reference: "category/happiness",
               ),
           transition: Transition.rightToLeftWithFade);
       break;
     case 'Movies':
-      Get.to(() => const CategoryPage(
+      Get.to(
+          () => const CategoryPage(
                 reference: "category/movies",
               ),
           transition: Transition.leftToRightWithFade);
       break;
     case 'Hindi':
-      Get.to(() => const CategoryPage(
+      Get.to(
+          () => const CategoryPage(
                 reference: "home/hindi",
               ),
           transition: Transition.rightToLeftWithFade);
       break;
     case 'Best Wishes':
-      Get.to(() => const CategoryPage(
+      Get.to(
+          () => const CategoryPage(
                 reference: "category/bestwishes",
               ),
           transition: Transition.leftToRightWithFade);
       break;
     case 'Friendship':
-      Get.to(() => const CategoryPage(
+      Get.to(
+          () => const CategoryPage(
                 reference: "category/friendship",
               ),
           transition: Transition.rightToLeftWithFade);
       break;
 
     case 'Success':
-      Get.to(() => const CategoryPage(
+      Get.to(
+          () => const CategoryPage(
                 reference: "category/success",
               ),
           transition: Transition.leftToRightWithFade);
       break;
     case 'Motivational':
-      Get.to(() => const CategoryPage(
+      Get.to(
+          () => const CategoryPage(
                 reference: "home/motivational",
               ),
           transition: Transition.rightToLeftWithFade);
       break;
 
     case 'Fitness':
-      Get.to(() => const CategoryPage(
+      Get.to(
+          () => const CategoryPage(
                 reference: "category/fitness",
               ),
           transition: Transition.leftToRightWithFade);
       break;
     case 'Nature':
-      Get.to(() => const CategoryPage(
+      Get.to(
+          () => const CategoryPage(
                 reference: "category/nature",
               ),
           transition: Transition.rightToLeftWithFade);
       break;
     case 'Courage':
-      Get.to(() => const CategoryPage(
+      Get.to(
+          () => const CategoryPage(
                 reference: "category/courage",
               ),
           transition: Transition.leftToRightWithFade);
       break;
     case 'Business':
-      Get.to(() => const CategoryPage(
+      Get.to(
+          () => const CategoryPage(
                 reference: "category/business",
               ),
           transition: Transition.rightToLeftWithFade);
       break;
     case 'Power':
-      Get.to(() => const CategoryPage(
+      Get.to(
+          () => const CategoryPage(
                 reference: "category/power",
               ),
           transition: Transition.leftToRightWithFade);
       break;
     case 'Wisdom':
-      Get.to(() => const CategoryPage(
+      Get.to(
+          () => const CategoryPage(
                 reference: "category/wisdom",
               ),
           transition: Transition.rightToLeftWithFade);
