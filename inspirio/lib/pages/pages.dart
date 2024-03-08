@@ -12,7 +12,6 @@ import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:inspirio/components/widgets.dart';
 import 'package:inspirio/creator/creator_photo.dart';
 import 'package:inspirio/services/admob_services.dart';
-import 'package:inspirio/util/theme_provider.dart';
 // import 'package:google_mobile_ads/google_mobile_ads.dart';
 // import 'package:inspirio/services/ad_provider.dart';
 import 'package:path_provider/path_provider.dart';
@@ -315,57 +314,56 @@ class CategoryPageState extends State<CategoryPage>
   }
 
   Widget _buildImageWidget(String imageUrl) {
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, child) {
-        Color primaryColour = themeProvider.themeData.colorScheme.primary;
-        final heroTag = 'image_hero_$imageUrl';
+    Color backgroundColour = Colors.black;
+    Color primaryColour = Colors.red;
+    Color secondaryColour = Colors.green;
+    final heroTag = 'image_hero_$imageUrl';
 
-        return Hero(
-          tag: heroTag,
-          child: GestureDetector(
-            onTap: () {
-              _showFullScreenImage(imageUrl, heroTag, themeProvider);
-            },
-            child: Padding(
-              padding: EdgeInsets.all(4.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: primaryColour.withOpacity(0.2),
-                      blurRadius: 1,
-                      offset: const Offset(0, 0),
-                    ),
-                  ],
+    return Hero(
+      tag: heroTag,
+      child: GestureDetector(
+        onTap: () {
+          _showFullScreenImage(imageUrl, heroTag);
+        },
+        child: Padding(
+          padding: EdgeInsets.all(4.0),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8.0),
+              boxShadow: [
+                BoxShadow(
+                  color: primaryColour.withOpacity(0.2),
+                  blurRadius: 1,
+                  offset: const Offset(0, 0),
                 ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8.0),
-                  child: CachedNetworkImage(
-                    fadeInDuration: const Duration(milliseconds: 100),
-                    fadeOutDuration: const Duration(milliseconds: 100),
-                    imageUrl: imageUrl,
-                    placeholder: (context, url) =>
-                        Components.buildPlaceholder(),
-                    errorWidget: (context, url, error) =>
-                        Components.buildErrorWidget(),
-                    fit: BoxFit.cover,
-                    cacheManager: DefaultCacheManager(),
-                  ),
-                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: CachedNetworkImage(
+                fadeInDuration: const Duration(milliseconds: 100),
+                fadeOutDuration: const Duration(milliseconds: 100),
+                imageUrl: imageUrl,
+                placeholder: (context, url) => Components.buildPlaceholder(),
+                errorWidget: (context, url, error) =>
+                    Components.buildErrorWidget(),
+                fit: BoxFit.cover,
+                cacheManager: DefaultCacheManager(),
               ),
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
   void _showFullScreenImage(
-      String imageUrl, String heroTag, ThemeProvider themeProvider) {
-    Color backgroundColour = themeProvider.themeData.colorScheme.background;
-    Color primaryColour = themeProvider.themeData.colorScheme.primary;
-    Color secondaryColour = themeProvider.themeData.colorScheme.secondary;
+    String imageUrl,
+    String heroTag,
+  ) {
+    Color backgroundColour = Colors.black;
+    Color primaryColour = Colors.red;
+    Color secondaryColour = Colors.green;
 
     Navigator.of(context).push(
       PageRouteBuilder(

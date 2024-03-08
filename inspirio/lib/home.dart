@@ -1,31 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:inspirio/pages/homepage.dart';
 import 'package:inspirio/pages/poetry.dart';
+import 'package:inspirio/status/screens/home_screen.dart';
 import 'package:inspirio/util/settings.dart';
 
 import 'pages/category.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
+  static const numOfTabs = 2;
 
   @override
-  State<HomePage> createState() => HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
   int selectedPageIndex = 0;
 
   final List<Widget> _pages = [
-    InspirioHome(),
-    Center(
-      child: Text(
-        'Unlearn 🐛',
-      ),
-    ),
-    Category(),
-    PoetryPage(),
-    SettingsPage(),
+    const InspirioHome(),
+    const InspirioStatusSaver(),
+    const Category(),
+    const PoetryPage(),
+    const SettingsPage(),
   ];
 
   @override

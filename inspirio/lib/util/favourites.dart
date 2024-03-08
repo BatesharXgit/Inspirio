@@ -114,11 +114,10 @@ class _FavouritesQuotesPageState extends State<FavouritesQuotesPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, child) {
-        Color backgroundColour = themeProvider.themeData.colorScheme.background;
-        return Scaffold(
+  Widget build(BuildContext context) {  Color backgroundColour = Colors.black;
+    Color primaryColour = Colors.red;
+    Color secondaryColour = Colors.green;
+    return  Scaffold(
           appBar: AppBar(
             iconTheme: Theme.of(context).iconTheme,
             actions: [
@@ -155,7 +154,7 @@ class _FavouritesQuotesPageState extends State<FavouritesQuotesPage> {
                       child: GestureDetector(
                         onTap: () {
                           _showFullScreenImage(
-                              favoriteImages[index], themeProvider);
+                              favoriteImages[index]);
                         },
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(20),
@@ -172,14 +171,11 @@ class _FavouritesQuotesPageState extends State<FavouritesQuotesPage> {
             ),
           ),
         );
-      },
-    );
-  }
+      }
 
-  void _showFullScreenImage(String imageUrl, ThemeProvider themeProvider) {
-    Color backgroundColour = themeProvider.themeData.colorScheme.background;
-    Color primaryColour = themeProvider.themeData.colorScheme.primary;
-    Color secondaryColour = themeProvider.themeData.colorScheme.secondary;
+  void _showFullScreenImage(String imageUrl,  ) {  Color backgroundColour = Colors.black;
+    Color primaryColour = Colors.red;
+    Color secondaryColour = Colors.green;
 
     Navigator.of(context).push(
       PageRouteBuilder(

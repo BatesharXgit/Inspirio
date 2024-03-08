@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -19,7 +20,6 @@ import 'package:inspirio/pages/poetry.dart';
 import 'package:inspirio/services/admob_services.dart';
 import 'package:inspirio/util/favourites.dart';
 import 'package:inspirio/util/settings.dart';
-import 'package:inspirio/util/theme_provider.dart';
 // import 'package:google_mobile_ads/google_mobile_ads.dart';
 // import 'package:inspirio/services/ad_provider.dart';
 import 'package:path_provider/path_provider.dart';
@@ -104,15 +104,16 @@ List<Reference> morningRefs = [];
 List<Reference> motivationalRefs = [];
 List<Reference> attitudeRefs = [];
 
-class InspirioHome extends StatefulWidget {
-  const InspirioHome({Key? key}) : super(key: key);
+class InspirioHome extends ConsumerStatefulWidget {
+  const InspirioHome({super.key});
+  static const numOfTabs = 2;
 
   @override
-  State<InspirioHome> createState() => InspirioHomeState();
+  ConsumerState<InspirioHome> createState() => _InspirioHomeState();
 }
 
-class InspirioHomeState extends State<InspirioHome>
-    with SingleTickerProviderStateMixin {
+class _InspirioHomeState extends ConsumerState<InspirioHome>
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late TabController _tabController;
 
   late SharedPreferences _prefs;
@@ -132,6 +133,7 @@ class InspirioHomeState extends State<InspirioHome>
     super.initState();
     _loadFavoriteImages();
     _createInterstitialAd();
+    WidgetsBinding.instance.addObserver(this);
     _tabController = TabController(length: 6, vsync: this);
     refreshForYouImages();
     refreshPopularImages();
@@ -194,6 +196,7 @@ class InspirioHomeState extends State<InspirioHome>
   @override
   void dispose() {
     _tabController.dispose();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -268,230 +271,223 @@ class InspirioHomeState extends State<InspirioHome>
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      theme: Provider.of<ThemeProvider>(context).themeData,
-      home: Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
-        Color backgroundColour = themeProvider.themeData.colorScheme.background;
-        Color primaryColour = themeProvider.themeData.colorScheme.primary;
-        return Scaffold(
-          key: _scaffoldKey,
-          appBar: null,
-          backgroundColor: backgroundColour,
-          body: FutureBuilder<ListResult>(
-            future: foryouRef.listAll(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const SplashScreen();
-              } else {
-                return SafeArea(
-                  child: NestedScrollView(
-                    controller: ScrollController(),
-                    headerSliverBuilder: (context, innerBoxIsScrolled) {
-                      return <Widget>[
-                        SliverAppBar(
-                          expandedHeight:
-                              MediaQuery.of(context).size.height * 0.1,
-                          floating: true,
-                          pinned: false,
-                          elevation: 0,
-                          backgroundColor:
-                              Theme.of(context).colorScheme.background,
-                          flexibleSpace: FlexibleSpaceBar(
-                            centerTitle: false,
-                            title: null,
-                            background: Container(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .background
-                                  .withOpacity(0.5),
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'Inspirio',
-                                      style: GoogleFonts.cookie(
-                                        // fontFamily: 'Anurati',
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .secondary,
-                                        fontSize: 44,
-                                        // fontWeight: FontWeight.bold,
+    Color backgroundColour = Colors.black;
+    Color primaryColour = Colors.red;
+    return MaterialApp(
+      home: Scaffold(
+        key: _scaffoldKey,
+        appBar: null,
+        backgroundColor: backgroundColour,
+        body: FutureBuilder<ListResult>(
+          future: foryouRef.listAll(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const SplashScreen();
+            } else {
+              return SafeArea(
+                child: NestedScrollView(
+                  controller: ScrollController(),
+                  headerSliverBuilder: (context, innerBoxIsScrolled) {
+                    return <Widget>[
+                      SliverAppBar(
+                        expandedHeight:
+                            MediaQuery.of(context).size.height * 0.1,
+                        floating: true,
+                        pinned: false,
+                        elevation: 0,
+                        backgroundColor:
+                            Theme.of(context).colorScheme.background,
+                        flexibleSpace: FlexibleSpaceBar(
+                          centerTitle: false,
+                          title: null,
+                          background: Container(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .background
+                                .withOpacity(0.5),
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Inspirio',
+                                    style: GoogleFonts.cookie(
+                                      // fontFamily: 'Anurati',
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary,
+                                      fontSize: 44,
+                                      // fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(
+                                          Iconsax.heart,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .secondary,
+                                          size: 28,
+                                        ),
+                                        onPressed: () => Get.to(
+                                          const FavouritesQuotesPage(),
+                                          transition:
+                                              Transition.rightToLeftWithFade,
+                                        ),
                                       ),
-                                    ),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        IconButton(
-                                          icon: Icon(
-                                            Iconsax.heart,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .secondary,
-                                            size: 28,
-                                          ),
-                                          onPressed: () => Get.to(
-                                            const FavouritesQuotesPage(),
-                                            transition:
-                                                Transition.rightToLeftWithFade,
-                                          ),
+                                      IconButton(
+                                        icon: Icon(
+                                          Iconsax.setting,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .secondary,
+                                          size: 28,
                                         ),
-                                        IconButton(
-                                          icon: Icon(
-                                            Iconsax.setting,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .secondary,
-                                            size: 28,
-                                          ),
-                                          onPressed: () => Get.to(
-                                            const SettingsPage(),
-                                            transition:
-                                                Transition.rightToLeftWithFade,
-                                          ),
+                                        onPressed: () => Get.to(
+                                          const SettingsPage(),
+                                          transition:
+                                              Transition.rightToLeftWithFade,
                                         ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
                             ),
                           ),
                         ),
-                        SliverPersistentHeader(
-                          pinned: true,
-                          delegate: _SliverAppBarDelegate(_buildTabBar()),
-                        ),
-                      ];
-                    },
-                    body: _buildTabViews(),
+                      ),
+                      SliverPersistentHeader(
+                        pinned: true,
+                        delegate: _SliverAppBarDelegate(_buildTabBar()),
+                      ),
+                    ];
+                  },
+                  body: _buildTabViews(),
+                ),
+              );
+            }
+          },
+        ),
+        floatingActionButton: FutureBuilder<ListResult>(
+          future: foryouRef.listAll(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const SizedBox();
+            } else {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  FloatingActionButton(
+                    heroTag: 1,
+                    backgroundColor: primaryColour,
+                    onPressed: () => Get.to(
+                      const Category(),
+                      transition: Transition.downToUp,
+                    ),
+                    child: Icon(
+                      Iconsax.quote_up_square,
+                      color: Theme.of(context).colorScheme.secondary,
+                      size: 30,
+                    ),
                   ),
-                );
-              }
-            },
-          ),
-          floatingActionButton: FutureBuilder<ListResult>(
-            future: foryouRef.listAll(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const SizedBox();
-              } else {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    FloatingActionButton(
-                      heroTag: 1,
-                      backgroundColor: primaryColour,
-                      onPressed: () => Get.to(
-                        const Category(),
-                        transition: Transition.downToUp,
-                      ),
-                      child: Icon(
-                        Iconsax.quote_up_square,
-                        color: Theme.of(context).colorScheme.secondary,
-                        size: 30,
-                      ),
+                  const SizedBox(
+                    width: 8.0,
+                  ),
+                  FloatingActionButton(
+                    heroTag: 2,
+                    backgroundColor: primaryColour,
+                    onPressed: () => Get.to(
+                      const PoetryPage(),
+                      transition: Transition.downToUp,
                     ),
-                    const SizedBox(
-                      width: 8.0,
+                    child: Icon(
+                      Iconsax.note_1,
+                      color: Theme.of(context).colorScheme.secondary,
+                      size: 30,
                     ),
-                    FloatingActionButton(
-                      heroTag: 2,
-                      backgroundColor: primaryColour,
-                      onPressed: () => Get.to(
-                        const PoetryPage(),
-                        transition: Transition.downToUp,
-                      ),
-                      child: Icon(
-                        Iconsax.note_1,
-                        color: Theme.of(context).colorScheme.secondary,
-                        size: 30,
-                      ),
+                  ),
+                  const SizedBox(
+                    width: 8.0,
+                  ),
+                  FloatingActionButton.extended(
+                    backgroundColor: primaryColour,
+                    onPressed: () => Get.to(
+                      const InspirioCreator(),
+                      transition: Transition.topLevel,
                     ),
-                    const SizedBox(
-                      width: 8.0,
+                    heroTag: 3,
+                    label: Text(
+                      'Create',
+                      style: GoogleFonts.kanit(
+                          color: Theme.of(context).colorScheme.secondary,
+                          fontSize: 18),
                     ),
-                    FloatingActionButton.extended(
-                      backgroundColor: primaryColour,
-                      onPressed: () => Get.to(
-                        const InspirioCreator(),
-                        transition: Transition.topLevel,
-                      ),
-                      heroTag: 3,
-                      label: Text(
-                        'Create',
-                        style: GoogleFonts.kanit(
-                            color: Theme.of(context).colorScheme.secondary,
-                            fontSize: 18),
-                      ),
-                      icon: Icon(
-                        Iconsax.magicpen,
-                        color: Theme.of(context).colorScheme.secondary,
-                        size: 30,
-                      ),
+                    icon: Icon(
+                      Iconsax.magicpen,
+                      color: Theme.of(context).colorScheme.secondary,
+                      size: 30,
                     ),
-                  ],
-                );
-              }
-            },
-          ),
-        );
-      }),
+                  ),
+                ],
+              );
+            }
+          },
+        ),
+      ),
     );
   }
 
   Widget _buildTabBar() {
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, child) {
-        Color primaryColour = themeProvider.themeData.colorScheme.primary;
-        return Container(
-          height: 100,
-          color: themeProvider.themeData.colorScheme.background,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(10, 2, 0, 2),
-            child: TabBar(
-              dividerColor: Colors.transparent,
-              tabAlignment: TabAlignment.start,
-              physics: const BouncingScrollPhysics(),
-              indicatorPadding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
-              controller: _tabController,
-              indicatorColor: themeProvider.themeData.colorScheme.secondary,
-              indicator: BoxDecoration(
-                color: themeProvider.themeData.colorScheme.secondary,
+    Color backgroundColour = Colors.black;
+    Color primaryColour = Colors.red;
+    Color secondaryColour = Colors.green;
+    return Container(
+      height: 100,
+      color: backgroundColour,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(10, 2, 0, 2),
+        child: TabBar(
+          dividerColor: Colors.transparent,
+          tabAlignment: TabAlignment.start,
+          physics: const BouncingScrollPhysics(),
+          indicatorPadding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
+          controller: _tabController,
+          indicatorColor: secondaryColour,
+          indicator: BoxDecoration(
+            color: secondaryColour,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          labelColor: primaryColour,
+          unselectedLabelColor: primaryColour,
+          isScrollable: true,
+          labelPadding: const EdgeInsets.symmetric(horizontal: 5),
+          tabs: data.map((tab) {
+            return Container(
+              height: MediaQuery.of(context).size.height * 0.046,
+              width: MediaQuery.of(context).size.width * 0.25,
+              decoration: BoxDecoration(
+                border: Border.all(width: 2.0, color: secondaryColour),
                 borderRadius: BorderRadius.circular(20),
               ),
-              labelColor: primaryColour,
-              unselectedLabelColor: primaryColour,
-              isScrollable: true,
-              labelPadding: const EdgeInsets.symmetric(horizontal: 5),
-              tabs: data.map((tab) {
-                return Container(
-                  height: MediaQuery.of(context).size.height * 0.046,
-                  width: MediaQuery.of(context).size.width * 0.25,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                        width: 2.0,
-                        color: themeProvider.themeData.colorScheme.secondary),
-                    borderRadius: BorderRadius.circular(20),
+              child: Tab(
+                child: Text(
+                  tab,
+                  style: GoogleFonts.kanit(
+                    fontSize: 14,
                   ),
-                  child: Tab(
-                    child: Text(
-                      tab,
-                      style: GoogleFonts.kanit(
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-        );
-      },
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ),
     );
   }
 
@@ -773,57 +769,56 @@ class InspirioHomeState extends State<InspirioHome>
   // }
 
   Widget _buildImageWidget(String imageUrl) {
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, child) {
-        Color primaryColour = themeProvider.themeData.colorScheme.primary;
-        final heroTag = 'image_hero_$imageUrl';
-
-        return Hero(
-          tag: heroTag,
-          child: GestureDetector(
-            onTap: () {
-              _showFullScreenImage(imageUrl, heroTag, themeProvider);
-            },
-            child: Padding(
-              padding: EdgeInsets.all(4.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: primaryColour.withOpacity(0.2),
-                      blurRadius: 1,
-                      offset: const Offset(0, 0),
-                    ),
-                  ],
+    Color backgroundColour = Colors.black;
+    Color primaryColour = Colors.red;
+    Color secondaryColour = Colors.green;
+    final heroTag = 'image_hero_$imageUrl';
+    return Hero(
+      tag: heroTag,
+      child: GestureDetector(
+        onTap: () {
+          _showFullScreenImage(imageUrl, heroTag);
+        },
+        child: Padding(
+          padding: EdgeInsets.all(4.0),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8.0),
+              boxShadow: [
+                BoxShadow(
+                  color: primaryColour.withOpacity(0.2),
+                  blurRadius: 1,
+                  offset: const Offset(0, 0),
                 ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8.0),
-                  child: CachedNetworkImage(
-                    fadeInDuration: const Duration(milliseconds: 100),
-                    fadeOutDuration: const Duration(milliseconds: 100),
-                    imageUrl: imageUrl,
-                    placeholder: (context, url) =>
-                        Components.buildPlaceholder(),
-                    errorWidget: (context, url, error) =>
-                        Components.buildErrorWidget(),
-                    fit: BoxFit.cover,
-                    cacheManager: DefaultCacheManager(),
-                  ),
-                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: CachedNetworkImage(
+                fadeInDuration: const Duration(milliseconds: 100),
+                fadeOutDuration: const Duration(milliseconds: 100),
+                imageUrl: imageUrl,
+                placeholder: (context, url) => Components.buildPlaceholder(),
+                errorWidget: (context, url, error) =>
+                    Components.buildErrorWidget(),
+                fit: BoxFit.cover,
+                cacheManager: DefaultCacheManager(),
               ),
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
   void _showFullScreenImage(
-      String imageUrl, String heroTag, ThemeProvider themeProvider) {
-    Color backgroundColour = themeProvider.themeData.colorScheme.background;
-    Color primaryColour = themeProvider.themeData.colorScheme.primary;
-    Color secondaryColour = themeProvider.themeData.colorScheme.secondary;
+    String imageUrl,
+    String heroTag,
+  ) {
+    Color backgroundColour = Colors.black;
+    Color primaryColour = Colors.red;
+    Color secondaryColour = Colors.green;
+    final heroTag = 'image_hero_$imageUrl';
 
     Navigator.of(context).push(
       PageRouteBuilder(

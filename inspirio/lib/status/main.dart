@@ -34,7 +34,7 @@ class MyApp extends ConsumerWidget {
 
       theme: AppTheme.lightTheme(lightColorScheme),
       darkTheme: AppTheme.darkTheme(darkColorScheme),
-      home: const HomeScreen(),
+      home: const InspirioStatusSaver(),
     );
   }
 

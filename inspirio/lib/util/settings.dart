@@ -179,14 +179,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               iconColor: secondaryColour,
                               textColor: secondaryColour,
                               trailing: const Icon(Iconsax.arrow_right),
-                              onTap: () {
-                                Provider.of<ThemeProvider>(context,
-                                        listen: false)
-                                    .themeData = kAmoledTheme;
-                                Provider.of<ThemeProvider>(context,
-                                        listen: false)
-                                    .toggleTheme();
-                              },
+                              onTap: () {},
                             ),
                             ListTile(
                               leading: const Icon(Iconsax.paintbucket),
@@ -194,14 +187,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               iconColor: secondaryColour,
                               textColor: secondaryColour,
                               trailing: const Icon(Iconsax.arrow_right),
-                              onTap: () {
-                                Provider.of<ThemeProvider>(context,
-                                        listen: false)
-                                    .themeData = kLightTheme;
-                                Provider.of<ThemeProvider>(context,
-                                        listen: false)
-                                    .toggleTheme();
-                              },
+                              onTap: () {},
                             ),
                             ListTile(
                               leading: const Icon(Iconsax.paintbucket),
@@ -209,14 +195,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               iconColor: secondaryColour,
                               textColor: secondaryColour,
                               trailing: const Icon(Iconsax.arrow_right),
-                              onTap: () {
-                                Provider.of<ThemeProvider>(context,
-                                        listen: false)
-                                    .themeData = kColouredTheme;
-                                Provider.of<ThemeProvider>(context,
-                                        listen: false)
-                                    .toggleTheme();
-                              },
+                              onTap: () {},
                             ),
                           ],
                         ),

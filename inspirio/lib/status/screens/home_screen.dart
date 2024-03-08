@@ -9,15 +9,16 @@ import 'package:inspirio/status/services/delete_thumbnails.dart';
 import 'package:inspirio/status/widgets/do_or_die.dart';
 import 'package:quick_actions/quick_actions.dart';
 
-class HomeScreen extends ConsumerStatefulWidget {
-  const HomeScreen({super.key});
+class InspirioStatusSaver extends ConsumerStatefulWidget {
+  const InspirioStatusSaver({super.key});
   static const numOfTabs = 2;
 
   @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<InspirioStatusSaver> createState() =>
+      _InspirioStatusSaverState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen>
+class _InspirioStatusSaverState extends ConsumerState<InspirioStatusSaver>
     with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late TabController _tabController;
   String shortcut = 'no action set';
@@ -26,7 +27,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _tabController = TabController(vsync: this, length: HomeScreen.numOfTabs);
+    _tabController =
+        TabController(vsync: this, length: InspirioStatusSaver.numOfTabs);
     initQuickActions();
     deleteUnnecessaryThumbnailsIsolate([
       ...ref.read(recentStatusesProvider)?.toList() ?? [],
