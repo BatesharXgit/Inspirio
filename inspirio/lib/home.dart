@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:inspirio/pages/homepage.dart';
 import 'package:inspirio/pages/poetry.dart';
 import 'package:inspirio/status/screens/home_screen.dart';
-import 'package:inspirio/util/settings.dart';
 
 import 'pages/category.dart';
 
@@ -23,7 +22,6 @@ class _HomePageState extends ConsumerState<HomePage> {
     const InspirioStatusSaver(),
     const Category(),
     const PoetryPage(),
-    const SettingsPage(),
   ];
 
   @override
@@ -62,11 +60,6 @@ class _HomePageState extends ConsumerState<HomePage> {
               selectedIcon: Icon(Icons.history_edu),
               icon: Icon(Icons.history_edu_outlined),
               label: 'Poetry',
-            ),
-            NavigationDestination(
-              selectedIcon: Icon(Icons.person),
-              icon: Icon(Icons.person_outline),
-              label: 'Account',
             ),
           ],
         ),
