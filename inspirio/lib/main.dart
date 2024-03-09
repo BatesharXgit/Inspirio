@@ -4,8 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:inspirio/home.dart';
+import 'package:inspirio/pages/homepage.dart';
 import 'package:inspirio/status/providers.dart';
-import 'package:inspirio/status/screens/home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
@@ -23,11 +23,17 @@ Future<void> main() async {
   await FirebaseAppCheck.instance.activate(
     androidProvider: AndroidProvider.playIntegrity,
   );
+  await preloadData();
   runApp(
     const ProviderScope(
       child: MyApp(),
     ),
   );
+}
+
+Future<void> preloadData() async {
+  final inspirioHome = const InspirioHome();
+  await inspirioHome.initializeData();
 }
 
 class MyApp extends ConsumerWidget {

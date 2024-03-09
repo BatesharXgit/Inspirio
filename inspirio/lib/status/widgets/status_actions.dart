@@ -93,13 +93,13 @@ class DeleteAction extends ConsumerWidget {
                       .then(
                     (value) {
                       pop(context);
-                      pop(context);
                       showToast(message: "Status deleted");
                       if (isVideoPlaying) {
                         chewieController?.play();
                       }
                     },
                   );
+                  // Navigator.pop(context);
                 },
                 child: Text("DELETE"),
               ),

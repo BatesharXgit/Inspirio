@@ -100,6 +100,11 @@ class InspirioHome extends ConsumerStatefulWidget {
   const InspirioHome({super.key});
   static const numOfTabs = 2;
 
+  Future<void> initializeData() async {
+    final state = _InspirioHomeState();
+    await state.refreshForYouImages();
+  }
+
   @override
   ConsumerState<InspirioHome> createState() => _InspirioHomeState();
 }
@@ -127,13 +132,44 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
     _createInterstitialAd();
     WidgetsBinding.instance.addObserver(this);
     _tabController = TabController(length: 6, vsync: this);
+    _tabController.addListener(_handleTabSelection);
     refreshForYouImages();
-    refreshPopularImages();
-    refreshHindiImages();
-    refreshMorningImages();
-    refreshMotivationalImages();
-    refreshAttitudeImages();
     isImageLoaded = true;
+  }
+
+  void _handleTabSelection() {
+    if (_tabController.indexIsChanging) {
+      switch (_tabController.index) {
+        case 0:
+          refreshForYouImages();
+          break;
+        case 1:
+          refreshPopularImages();
+          break;
+        case 2:
+          refreshHindiImages();
+          break;
+        case 3:
+          refreshMorningImages();
+          break;
+        case 4:
+          refreshMotivationalImages();
+          break;
+        case 5:
+          refreshAttitudeImages();
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _tabController.removeListener(_handleTabSelection);
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   InterstitialAd? _interstitialAd;
@@ -183,13 +219,6 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
       }
     });
     _prefs.setStringList('favoriteImages', favoriteImages);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
   }
 
   Future<void> refreshForYouImages() async {
@@ -304,7 +333,7 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
                               ),
                               IconButton(
                                 icon: Icon(
-                                  Iconsax.setting,
+                                  Icons.settings,
                                   color:
                                       Theme.of(context).colorScheme.secondary,
                                   size: 28,
@@ -451,8 +480,8 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
         slivers: <Widget>[
           SliverGrid(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.75,
+              crossAxisCount: 1,
+              childAspectRatio: 0.8,
             ),
             delegate:
                 SliverChildBuilderDelegate((BuildContext context, int index) {
@@ -494,8 +523,8 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
         slivers: <Widget>[
           SliverGrid(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.75,
+              crossAxisCount: 1,
+              childAspectRatio: 0.8,
             ),
             delegate:
                 SliverChildBuilderDelegate((BuildContext context, int index) {
@@ -533,8 +562,8 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
         slivers: <Widget>[
           SliverGrid(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.75,
+              crossAxisCount: 1,
+              childAspectRatio: 0.8,
             ),
             delegate:
                 SliverChildBuilderDelegate((BuildContext context, int index) {
@@ -579,8 +608,8 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
         slivers: <Widget>[
           SliverGrid(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.75,
+              crossAxisCount: 1,
+              childAspectRatio: 0.8,
             ),
             delegate: SliverChildBuilderDelegate(
               (BuildContext context, int index) {
@@ -623,8 +652,8 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
         slivers: <Widget>[
           SliverGrid(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.75,
+              crossAxisCount: 1,
+              childAspectRatio: 0.8,
             ),
             delegate: SliverChildBuilderDelegate(
               (BuildContext context, int index) {
