@@ -1,12 +1,13 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:inspirio/status/providers.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:inspirio/status/common.dart';
 import 'package:inspirio/status/models/tab_type.dart';
 import 'package:inspirio/status/screens/give_permissions_screen.dart';
 import 'package:inspirio/status/services/delete_thumbnails.dart';
-import 'package:inspirio/status/widgets/do_or_die.dart';
+import 'package:inspirio/status/widgets/status_tabs.dart';
 import 'package:quick_actions/quick_actions.dart';
 
 class InspirioStatusSaver extends ConsumerStatefulWidget {
@@ -69,6 +70,10 @@ class _InspirioStatusSaverState extends ConsumerState<InspirioStatusSaver>
 
   @override
   Widget build(BuildContext context) {
+    Color primaryColour = Theme.of(context).colorScheme.primary;
+
+    Color backgroundColour = Theme.of(context).colorScheme.background;
+    Color secondaryColour = Theme.of(context).colorScheme.secondary;
     final storagePermissionStatus = ref.watch(storagePermissionProvider);
 
     if (storagePermissionStatus == null) {
@@ -80,9 +85,16 @@ class _InspirioStatusSaverState extends ConsumerState<InspirioStatusSaver>
     return (storagePermissionStatus == PermissionStatus.granted)
         ? Scaffold(
             appBar: AppBar(
-              title: Text("Status"),
+              title: Text(
+                'WhatsApp Status',
+                style: GoogleFonts.cookie(
+                  // fontFamily: 'Anurati',
+                  color: secondaryColour,
+                  fontSize: 34,
+                  // fontWeight: FontWeight.bold,
+                ),
+              ),
               elevation: 4,
-              centerTitle: true,
               bottom: TabBar(
                 controller: _tabController,
                 tabs: [

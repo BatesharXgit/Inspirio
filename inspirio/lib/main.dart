@@ -6,6 +6,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:inspirio/home.dart';
 import 'package:inspirio/pages/homepage.dart';
 import 'package:inspirio/status/providers.dart';
+import 'package:inspirio/themes/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
@@ -45,6 +46,9 @@ class MyApp extends ConsumerWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      themeMode: ThemeMode.system,
+      theme: kLightTheme,
+      darkTheme: kAmoledTheme,
       // home: const InspirioStatusSaver(),
       home: HomePage(),
     );

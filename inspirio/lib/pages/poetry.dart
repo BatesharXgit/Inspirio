@@ -371,36 +371,26 @@ class PoetryPageState extends State<PoetryPage>
           slivers: <Widget>[
             SliverGrid(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.75,
+                crossAxisCount: 1,
+                childAspectRatio: 0.8,
               ),
               delegate: SliverChildBuilderDelegate(
                 (BuildContext context, int index) {
-                  if (index % 10 == 0 && index > 0) {
-                    return _buildNativeAdWidget();
-                  } else {
-                    final fyIndex = index - (index ~/ 10);
-                    if (fyIndex < poetryRefs.length) {
-                      final fy = poetryRefs[fyIndex];
-                      return FutureBuilder<String>(
-                        future: fy.getDownloadURL(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return Components.buildPlaceholder();
-                          } else if (snapshot.hasError) {
-                            return Components.buildErrorWidget();
-                          } else if (snapshot.hasData) {
-                            return _buildImageWidget(snapshot.data!);
-                          } else {
-                            return Container();
-                          }
-                        },
-                      );
-                    } else {
-                      return const SizedBox.shrink();
-                    }
-                  }
+                  final fy = poetryRefs[index];
+                  return FutureBuilder<String>(
+                    future: fy.getDownloadURL(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Components.buildPlaceholder();
+                      } else if (snapshot.hasError) {
+                        return Components.buildErrorWidget();
+                      } else if (snapshot.hasData) {
+                        return _buildImageWidget(snapshot.data!);
+                      } else {
+                        return Container();
+                      }
+                    },
+                  );
                 },
               ),
             ),

@@ -12,6 +12,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:inspirio/components/widgets.dart';
+import 'package:inspirio/creator/creator.dart';
 import 'package:inspirio/creator/creator_photo.dart';
 import 'package:inspirio/services/admob_services.dart';
 import 'package:inspirio/util/settings.dart';
@@ -292,12 +293,14 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
 
   @override
   Widget build(BuildContext context) {
-    Color backgroundColour = Colors.black;
+    Color backgroundColour = Theme.of(context).colorScheme.background;
+    Color primaryColour = Theme.of(context).colorScheme.primary;
+    Color secondaryColour = Theme.of(context).colorScheme.secondary;
     return MaterialApp(
       home: Scaffold(
         key: _scaffoldKey,
         appBar: null,
-        // backgroundColor: backgroundColour,
+        backgroundColor: backgroundColour,
         body: FutureBuilder<ListResult>(
           future: foryouRef.listAll(),
           builder: (context, snapshot) {
@@ -311,39 +314,42 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
                       floating: true,
                       pinned: false,
                       elevation: 0,
-                      backgroundColor: Theme.of(context).colorScheme.background,
+                      backgroundColor: backgroundColour,
                       flexibleSpace: FlexibleSpaceBar(
                         centerTitle: false,
                         title: null,
-                        background: Padding(
-                          padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Inspirio',
-                                style: GoogleFonts.cookie(
-                                  // fontFamily: 'Anurati',
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
-                                  fontSize: 44,
-                                  // fontWeight: FontWeight.bold,
+                        background: Container(
+                          color: backgroundColour,
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Inspirio',
+                                  style: GoogleFonts.cookie(
+                                    // fontFamily: 'Anurati',
+                                    color: secondaryColour,
+                                    fontSize: 44,
+                                    // fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
-                              IconButton(
-                                icon: Icon(
-                                  Icons.settings,
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
-                                  size: 28,
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.settings,
+                                    color: secondaryColour,
+                                    size: 28,
+                                  ),
+                                  onPressed: () => Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const SettingsPage(),
+                                    ),
+                                  ),
                                 ),
-                                onPressed: () => Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                      builder: (context) => SettingsPage()),
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -359,14 +365,34 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
             );
           },
         ),
+        floatingActionButton: FloatingActionButton.extended(
+          backgroundColor: backgroundColour,
+          onPressed: () {
+            _showInterstitialAd();
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => InspirioCreator(),
+              ),
+            );
+          },
+          heroTag: 3,
+          icon: Icon(
+            Icons.create_outlined,
+            color: secondaryColour,
+          ),
+          label: Text(
+            'Create',
+            style: TextStyle(color: secondaryColour),
+          ),
+        ),
       ),
     );
   }
 
   Widget _buildTabBar() {
-    Color backgroundColour = Colors.black;
-    Color primaryColour = Colors.red;
-    Color secondaryColour = Colors.green;
+    Color backgroundColour = Theme.of(context).colorScheme.background;
+    Color primaryColour = Theme.of(context).colorScheme.primary;
+    Color secondaryColour = Theme.of(context).colorScheme.secondary;
     return Container(
       height: 100,
       color: backgroundColour,
@@ -443,24 +469,21 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
             ),
             delegate: SliverChildBuilderDelegate(
               (BuildContext context, int index) {
-                final fyIndex = index - (index ~/ 10);
-                if (fyIndex < foryouRefs.length) {
-                  final fy = foryouRefs[fyIndex];
-                  return FutureBuilder<String>(
-                    future: fy.getDownloadURL(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Components.buildPlaceholder();
-                      } else if (snapshot.hasError) {
-                        return Components.buildErrorWidget();
-                      } else if (snapshot.hasData) {
-                        return _buildImageWidget(snapshot.data!);
-                      } else {
-                        return Container();
-                      }
-                    },
-                  );
-                }
+                final fy = foryouRefs[index];
+                return FutureBuilder<String>(
+                  future: fy.getDownloadURL(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Components.buildPlaceholder();
+                    } else if (snapshot.hasError) {
+                      return Components.buildErrorWidget();
+                    } else if (snapshot.hasData) {
+                      return _buildImageWidget(snapshot.data!);
+                    } else {
+                      return Container();
+                    }
+                  },
+                );
               },
             ),
           ),
@@ -485,26 +508,21 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
             ),
             delegate:
                 SliverChildBuilderDelegate((BuildContext context, int index) {
-              final popularIndex = index - (index ~/ 10);
-              if (popularIndex < popularRefs.length) {
-                final pl = popularRefs[popularIndex];
-                return FutureBuilder<String>(
-                  future: pl.getDownloadURL(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Components.buildPlaceholder();
-                    } else if (snapshot.hasError) {
-                      return Components.buildErrorWidget();
-                    } else if (snapshot.hasData) {
-                      return _buildImageWidget(snapshot.data!);
-                    } else {
-                      return Container();
-                    }
-                  },
-                );
-              } else {
-                return const SizedBox.shrink();
-              }
+              final pl = popularRefs[index];
+              return FutureBuilder<String>(
+                future: pl.getDownloadURL(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Components.buildPlaceholder();
+                  } else if (snapshot.hasError) {
+                    return Components.buildErrorWidget();
+                  } else if (snapshot.hasData) {
+                    return _buildImageWidget(snapshot.data!);
+                  } else {
+                    return Container();
+                  }
+                },
+              );
             }),
           ),
         ],
@@ -528,26 +546,21 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
             ),
             delegate:
                 SliverChildBuilderDelegate((BuildContext context, int index) {
-              final hindiIndex = index - (index ~/ 10);
-              if (hindiIndex < hindiRefs.length) {
-                final hi = hindiRefs[hindiIndex];
-                return FutureBuilder<String>(
-                  future: hi.getDownloadURL(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Components.buildPlaceholder();
-                    } else if (snapshot.hasError) {
-                      return Components.buildErrorWidget();
-                    } else if (snapshot.hasData) {
-                      return _buildImageWidget(snapshot.data!);
-                    } else {
-                      return Container();
-                    }
-                  },
-                );
-              } else {
-                return const SizedBox.shrink();
-              }
+              final hi = hindiRefs[index];
+              return FutureBuilder<String>(
+                future: hi.getDownloadURL(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Components.buildPlaceholder();
+                  } else if (snapshot.hasError) {
+                    return Components.buildErrorWidget();
+                  } else if (snapshot.hasData) {
+                    return _buildImageWidget(snapshot.data!);
+                  } else {
+                    return Container();
+                  }
+                },
+              );
             }),
           ),
         ],
@@ -567,26 +580,21 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
             ),
             delegate:
                 SliverChildBuilderDelegate((BuildContext context, int index) {
-              final morningIndex = index - (index ~/ 10);
-              if (morningIndex < morningRefs.length) {
-                final mr = morningRefs[morningIndex];
-                return FutureBuilder<String>(
-                  future: mr.getDownloadURL(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Components.buildPlaceholder();
-                    } else if (snapshot.hasError) {
-                      return Components.buildErrorWidget();
-                    } else if (snapshot.hasData) {
-                      return _buildImageWidget(snapshot.data!);
-                    } else {
-                      return Container();
-                    }
-                  },
-                );
-              } else {
-                return const SizedBox.shrink();
-              }
+              final mr = morningRefs[index];
+              return FutureBuilder<String>(
+                future: mr.getDownloadURL(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Components.buildPlaceholder();
+                  } else if (snapshot.hasError) {
+                    return Components.buildErrorWidget();
+                  } else if (snapshot.hasData) {
+                    return _buildImageWidget(snapshot.data!);
+                  } else {
+                    return Container();
+                  }
+                },
+              );
             }),
           ),
         ],
@@ -613,26 +621,21 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
             ),
             delegate: SliverChildBuilderDelegate(
               (BuildContext context, int index) {
-                final motivationalIndex = index - (index ~/ 10);
-                if (motivationalIndex < motivationalRefs.length) {
-                  final mo = motivationalRefs[motivationalIndex];
-                  return FutureBuilder<String>(
-                    future: mo.getDownloadURL(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Components.buildPlaceholder();
-                      } else if (snapshot.hasError) {
-                        return Components.buildErrorWidget();
-                      } else if (snapshot.hasData) {
-                        return _buildImageWidget(snapshot.data!);
-                      } else {
-                        return Container();
-                      }
-                    },
-                  );
-                } else {
-                  return const SizedBox.shrink();
-                }
+                final mo = motivationalRefs[index];
+                return FutureBuilder<String>(
+                  future: mo.getDownloadURL(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Components.buildPlaceholder();
+                    } else if (snapshot.hasError) {
+                      return Components.buildErrorWidget();
+                    } else if (snapshot.hasData) {
+                      return _buildImageWidget(snapshot.data!);
+                    } else {
+                      return Container();
+                    }
+                  },
+                );
               },
             ),
           ),
@@ -657,26 +660,21 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
             ),
             delegate: SliverChildBuilderDelegate(
               (BuildContext context, int index) {
-                final attitudeIndex = index - (index ~/ 10);
-                if (attitudeIndex < attitudeRefs.length) {
-                  final at = attitudeRefs[attitudeIndex];
-                  return FutureBuilder<String>(
-                    future: at.getDownloadURL(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Components.buildPlaceholder();
-                      } else if (snapshot.hasError) {
-                        return Components.buildErrorWidget();
-                      } else if (snapshot.hasData) {
-                        return _buildImageWidget(snapshot.data!);
-                      } else {
-                        return Container();
-                      }
-                    },
-                  );
-                } else {
-                  return const SizedBox.shrink();
-                }
+                final at = attitudeRefs[index];
+                return FutureBuilder<String>(
+                  future: at.getDownloadURL(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Components.buildPlaceholder();
+                    } else if (snapshot.hasError) {
+                      return Components.buildErrorWidget();
+                    } else if (snapshot.hasData) {
+                      return _buildImageWidget(snapshot.data!);
+                    } else {
+                      return Container();
+                    }
+                  },
+                );
               },
             ),
           ),
@@ -689,9 +687,9 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
   // }
 
   Widget _buildImageWidget(String imageUrl) {
-    Color backgroundColour = Colors.black;
-    Color primaryColour = Colors.red;
-    Color secondaryColour = Colors.green;
+    Color backgroundColour = Theme.of(context).colorScheme.background;
+    Color primaryColour = Theme.of(context).colorScheme.primary;
+    Color secondaryColour = Theme.of(context).colorScheme.background;
     final heroTag = 'image_hero_$imageUrl';
     return Hero(
       tag: heroTag,
@@ -735,9 +733,9 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
     String imageUrl,
     String heroTag,
   ) {
-    Color backgroundColour = Colors.black;
-    Color primaryColour = Colors.red;
-    Color secondaryColour = Colors.green;
+    Color backgroundColour = Theme.of(context).colorScheme.background;
+    Color primaryColour = Theme.of(context).colorScheme.primary;
+    Color secondaryColour = Theme.of(context).colorScheme.background;
     final heroTag = 'image_hero_$imageUrl';
 
     Navigator.of(context).push(
@@ -783,6 +781,7 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
                           FloatingActionButton(
                             backgroundColor: primaryColour,
                             onPressed: () {
+                              Navigator.pop(context);
                               Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (context) => InspirioEditor(
@@ -790,8 +789,6 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
                                   ),
                                 ),
                               );
-
-                              Navigator.pop(context);
                             },
                             child: Icon(
                               Iconsax.pen_add,

@@ -106,249 +106,196 @@ class _SettingsPageState extends State<SettingsPage> {
       //   title: Text('Settings'),
       // ),
       backgroundColor: backgroundColour,
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                if (userName != null && userEmail != null)
-                  Column(
-                    children: [
-                      if (userPhotoUrl != null)
-                        CircleAvatar(
-                          radius: 64,
-                          backgroundImage:
-                              CachedNetworkImageProvider(userPhotoUrl!),
-                        ),
-                      const SizedBox(
-                        height: 8,
+      body: Column(
+        children: [
+          SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                    if (userName != null && userEmail != null)
+                      Column(
+                        children: [
+                          if (userPhotoUrl != null)
+                            CircleAvatar(
+                              radius: 64,
+                              backgroundImage:
+                                  CachedNetworkImageProvider(userPhotoUrl!),
+                            ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Text(
+                            '$userName',
+                            style: GoogleFonts.kanit(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: secondaryColour),
+                          ),
+                          const SizedBox(
+                            height: 8.0,
+                          ),
+                          Text(
+                            '$userEmail',
+                            style:
+                                TextStyle(fontSize: 16, color: primaryColour),
+                          ),
+                        ],
                       ),
-                      Text(
-                        '$userName',
-                        style: GoogleFonts.kanit(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: secondaryColour),
+                    const SizedBox(
+                      height: 50,
+                    ),
+                    Container(
+                      margin: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                      decoration: BoxDecoration(
+                        color: primaryColour.withOpacity(0.6),
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      const SizedBox(
-                        height: 8.0,
-                      ),
-                      Text(
-                        '$userEmail',
-                        style: TextStyle(fontSize: 16, color: primaryColour),
-                      ),
-                    ],
-                  ),
-                const SizedBox(
-                  height: 50,
-                ),
-                Container(
-                  margin: const EdgeInsets.fromLTRB(20, 8, 20, 0),
-                  decoration: BoxDecoration(
-                    color: primaryColour.withOpacity(0.6),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Column(
-                    children: <Widget>[
-                      ListTile(
-                        leading: const Icon(Iconsax.paintbucket),
-                        title: const Text('Change Theme'),
+                      child: ListTile(
+                        leading: const Icon(Icons.bug_report_outlined),
+                        title: const Text('Report a Bug'),
                         iconColor: secondaryColour,
                         textColor: secondaryColour,
-                        trailing: Icon(
-                          showThemeOptions
-                              ? Iconsax.arrow_down
-                              : Iconsax.arrow_right,
-                        ),
+                        trailing: const Icon(Iconsax.arrow_right),
                         onTap: () {
-                          setState(() {
-                            showThemeOptions = !showThemeOptions;
-                          });
+                          _launchUrl_report();
                         },
                       ),
-                      Visibility(
-                        visible: showThemeOptions,
-                        child: Column(
-                          children: <Widget>[
-                            ListTile(
-                              leading: const Icon(Iconsax.paintbucket),
-                              title: const Text('Amoled Theme'),
-                              iconColor: secondaryColour,
-                              textColor: secondaryColour,
-                              trailing: const Icon(Iconsax.arrow_right),
-                              onTap: () {},
+                    ),
+                    Container(
+                      margin: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                      decoration: BoxDecoration(
+                        color: primaryColour.withOpacity(0.6),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: ListTile(
+                        leading: const Icon(Iconsax.logout),
+                        title: const Text('Log Out'),
+                        iconColor: secondaryColour,
+                        textColor: secondaryColour,
+                        trailing: const Icon(Iconsax.arrow_right),
+                        onTap: () => FirebaseAuth.instance.signOut(),
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                      decoration: BoxDecoration(
+                        color: primaryColour.withOpacity(0.6),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: ListTile(
+                        leading: const Icon(Iconsax.back_square),
+                        title: const Text('Exit'),
+                        iconColor: secondaryColour,
+                        textColor: secondaryColour,
+                        trailing: const Icon(Iconsax.arrow_right),
+                        onTap: () {
+                          SystemNavigator.pop();
+                        },
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 50,
+                    ),
+                    Text(
+                      'Contact Us On:',
+                      style: TextStyle(
+                        color: primaryColour,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      color: Colors.transparent,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          GestureDetector(
+                            onTap: launchUrlPlayStore,
+                            child: Icon(
+                              BootstrapIcons.google_play,
+                              color: secondaryColour,
+                              size: 32,
                             ),
-                            ListTile(
-                              leading: const Icon(Iconsax.paintbucket),
-                              title: const Text('Light Theme'),
-                              iconColor: secondaryColour,
-                              textColor: secondaryColour,
-                              trailing: const Icon(Iconsax.arrow_right),
-                              onTap: () {},
+                          ),
+                          const SizedBox(
+                            width: 20,
+                          ),
+                          GestureDetector(
+                            onTap: launchUrlInstagram,
+                            child: Icon(
+                              BootstrapIcons.instagram,
+                              color: secondaryColour,
+                              size: 32,
                             ),
-                            ListTile(
-                              leading: const Icon(Iconsax.paintbucket),
-                              title: const Text('Coloured Theme'),
-                              iconColor: secondaryColour,
-                              textColor: secondaryColour,
-                              trailing: const Icon(Iconsax.arrow_right),
-                              onTap: () {},
+                          ),
+                          const SizedBox(
+                            width: 20,
+                          ),
+                          GestureDetector(
+                            onTap: launchUrlTwitter,
+                            child: Icon(
+                              BootstrapIcons.twitter,
+                              color: secondaryColour,
+                              size: 32,
                             ),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(
+                            width: 20,
+                          ),
+                          GestureDetector(
+                            onTap: launchUrlGithub,
+                            child: Icon(
+                              BootstrapIcons.github,
+                              color: secondaryColour,
+                              size: 32,
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 20,
+                          ),
+                          GestureDetector(
+                            onTap: launchUrlYoutube,
+                            child: Icon(
+                              BootstrapIcons.youtube,
+                              color: secondaryColour,
+                              size: 32,
+                            ),
+                          )
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.fromLTRB(20, 8, 20, 0),
-                  decoration: BoxDecoration(
-                    color: primaryColour.withOpacity(0.6),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: ListTile(
-                    leading: const Icon(Icons.bug_report_outlined),
-                    title: const Text('Report a Bug'),
-                    iconColor: secondaryColour,
-                    textColor: secondaryColour,
-                    trailing: const Icon(Iconsax.arrow_right),
-                    onTap: () {
-                      _launchUrl_report();
-                    },
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.fromLTRB(20, 8, 20, 0),
-                  decoration: BoxDecoration(
-                    color: primaryColour.withOpacity(0.6),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: ListTile(
-                    leading: const Icon(Iconsax.logout),
-                    title: const Text('Log Out'),
-                    iconColor: secondaryColour,
-                    textColor: secondaryColour,
-                    trailing: const Icon(Iconsax.arrow_right),
-                    onTap: () => FirebaseAuth.instance.signOut(),
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.fromLTRB(20, 8, 20, 0),
-                  decoration: BoxDecoration(
-                    color: primaryColour.withOpacity(0.6),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: ListTile(
-                    leading: const Icon(Iconsax.back_square),
-                    title: const Text('Exit'),
-                    iconColor: secondaryColour,
-                    textColor: secondaryColour,
-                    trailing: const Icon(Iconsax.arrow_right),
-                    onTap: () {
-                      SystemNavigator.pop();
-                    },
-                  ),
-                ),
-                const SizedBox(
-                  height: 50,
-                ),
-                Text(
-                  'Contact Us On:',
-                  style: TextStyle(
-                    color: primaryColour,
-                  ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Container(
-                  color: Colors.transparent,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      GestureDetector(
-                        onTap: launchUrlPlayStore,
-                        child: Icon(
-                          BootstrapIcons.google_play,
-                          color: secondaryColour,
-                          size: 32,
-                        ),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Inspirio v 1.1.0',
+                        style: GoogleFonts.kanit(
+                            color: primaryColour, fontSize: 10),
                       ),
-                      const SizedBox(
-                        width: 20,
+                    ),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Made in India.',
+                        style: GoogleFonts.kanit(
+                            color: primaryColour, fontSize: 10),
                       ),
-                      GestureDetector(
-                        onTap: launchUrlInstagram,
-                        child: Icon(
-                          BootstrapIcons.instagram,
-                          color: secondaryColour,
-                          size: 32,
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 20,
-                      ),
-                      GestureDetector(
-                        onTap: launchUrlTwitter,
-                        child: Icon(
-                          BootstrapIcons.twitter,
-                          color: secondaryColour,
-                          size: 32,
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 20,
-                      ),
-                      GestureDetector(
-                        onTap: launchUrlGithub,
-                        child: Icon(
-                          BootstrapIcons.github,
-                          color: secondaryColour,
-                          size: 32,
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 20,
-                      ),
-                      GestureDetector(
-                        onTap: launchUrlYoutube,
-                        child: Icon(
-                          BootstrapIcons.youtube,
-                          color: secondaryColour,
-                          size: 32,
-                        ),
-                      )
-                    ],
-                  ),
+                    )
+                  ],
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    'Inspirio v 1.1.0',
-                    style:
-                        GoogleFonts.kanit(color: primaryColour, fontSize: 10),
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    'Made in India.',
-                    style:
-                        GoogleFonts.kanit(color: primaryColour, fontSize: 10),
-                  ),
-                )
-              ],
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
