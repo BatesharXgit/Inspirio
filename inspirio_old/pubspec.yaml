@@ -21,8 +21,6 @@ dependencies:
   cached_network_image: ^3.2.3
   google_fonts: ^4.0.4
   flutter_material_color_picker: ^1.2.0
-  card_swiper: ^2.0.4
-  google_nav_bar: ^5.0.6
   flutter_floating_bottom_bar: ^1.1.0
   firebase_auth: ^4.7.2
   google_sign_in: ^6.1.4

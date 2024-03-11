@@ -130,8 +130,7 @@ class InspirioEditorState extends State<InspirioEditor>
   }
 
   InterstitialAd? _interstitialAd;
-  void _createBannerAd() {
-  }
+  void _createBannerAd() {}
 
   void _createInterstitialAd() {
     InterstitialAd.load(
@@ -525,65 +524,23 @@ class InspirioEditorState extends State<InspirioEditor>
             }).toList(),
           ),
         ),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColour,
-                elevation: 10,
-                shadowColor: primaryColour,
-              ),
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      backgroundColor: backgroundColour,
-                      title: Text(
-                        'Pick a color',
-                        style: GoogleFonts.kanit(color: primaryColour),
-                      ),
-                      content: SingleChildScrollView(
-                        child: MaterialColorPicker(
-                          alignment: WrapAlignment.spaceEvenly,
-                          runAlignment: WrapAlignment.center,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          selectedColor: selectedColor,
-                          onColorChange: (color) {
-                            setState(() {
-                              selectedColor = color;
-                            });
-                          },
-                          onMainColorChange: (color) {
-                            setState(() {
-                              selectedColor = color as Color;
-                            });
-                          },
-                        ),
-                      ),
-                      actions: <Widget>[
-                        IconButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          icon: Icon(
-                            Icons.done,
-                            color: primaryColour,
-                          ),
-                          color: primaryColour,
-                        )
-                      ],
-                    );
-                  },
-                );
-              },
-              child: Text(
-                'Pick a color',
-                style: GoogleFonts.kanit(color: backgroundColour),
-              ),
-            ),
-          ],
+        SingleChildScrollView(
+          child: MaterialColorPicker(
+            alignment: WrapAlignment.spaceEvenly,
+            runAlignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            selectedColor: selectedColor,
+            onColorChange: (color) {
+              setState(() {
+                selectedColor = color;
+              });
+            },
+            onMainColorChange: (color) {
+              setState(() {
+                selectedColor = color as Color;
+              });
+            },
+          ),
         ),
       ],
     );
