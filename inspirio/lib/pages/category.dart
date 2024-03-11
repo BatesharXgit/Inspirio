@@ -1,545 +1,481 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:ui' as ui;
+import 'dart:io';
+import 'dart:typed_data';
+import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:inspirio/pages/pages.dart';
+import 'package:iconsax/iconsax.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:inspirio/components/widgets.dart';
+import 'package:inspirio/creator/creator_photo.dart';
 import 'package:inspirio/services/admob_services.dart';
+// import 'package:google_mobile_ads/google_mobile_ads.dart';
+// import 'package:inspirio/services/ad_provider.dart';
+import 'package:path_provider/path_provider.dart';
+// import 'package:provider/provider.dart';
+import 'package:share/share.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+// ignore: depend_on_referenced_packages
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final FirebaseStorage storage = FirebaseStorage.instance;
-final Reference foryouRef = FirebaseStorage.instance.ref().child('categoryimg');
 
-class Category extends StatefulWidget {
-  const Category({Key? key}) : super(key: key);
+late SharedPreferences _prefs;
+List<String> favoriteImages = [];
 
-  @override
-  State<Category> createState() => CategoryState();
+late TabController _tabController;
+final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+final GlobalKey _globalKey = GlobalKey();
+
+void savetoGallery(BuildContext context) async {
+  try {
+    RenderRepaintBoundary boundary =
+        _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+    ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+    ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+
+    if (byteData != null) {
+      Uint8List pngBytes = byteData.buffer.asUint8List();
+      final externalDir = await getExternalStorageDirectory();
+      final filePath = '${externalDir!.path}/InspirioImage.png';
+      final file = File(filePath);
+      await file.writeAsBytes(pngBytes);
+      final result = await ImageGallerySaver.saveFile(filePath);
+
+      if (result['isSuccess']) {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Color(0xFF131321),
+            content: Text(
+              'Successfully saved to gallery 😊',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        );
+      } else {}
+    }
+    // ignore: empty_catches
+  } catch (e) {}
 }
 
-class CategoryState extends State<Category> {
-  final List<String> _imageReferences1 = [
-    'categoryimg/morning.jpg',
-    'categoryimg/birthday.jpg',
-    'categoryimg/religious.jpg',
-    'categoryimg/avengers.jpg',
-    'categoryimg/movies.jpg',
-    'categoryimg/best wishes.jpg',
-    'categoryimg/success.jpg',
-    'categoryimg/fitness.jpg',
-    'categoryimg/courage.jpg',
-    'categoryimg/power.jpg'
-  ];
-  final List<String> _imageReferences2 = [
-    'categoryimg/night.jpg',
-    'categoryimg/inspirational.jpg',
-    'categoryimg/leadership.jpg',
-    'categoryimg/happiness.jpg',
-    'categoryimg/hindi.jpg',
-    'categoryimg/friendship.jpg',
-    'categoryimg/motivational.jpg',
-    'categoryimg/nature.jpg',
-    'categoryimg/business.jpg',
-    'categoryimg/wisdom.jpg'
-  ];
-  final List<String> categories = [
-    'Morning', //done
-    'Night',
-    'Birthday',
-    'Inspirational',
-    'Religious',
-    'Leadership',
-    'Avengers', //done
-    'Happiness',
-    'Movies',
-    'Hindi',
-    'Best Wishes',
-    'Friendship',
-    'Success',
-    'Motivational',
-    'Fitness',
-    'Nature',
-    'Courage',
-    'Business',
-    'Power',
-    'Wisdom',
-  ];
+BannerAd? _banner;
+InterstitialAd? _interstitialAd;
+void _createBannerAd() {
+  _banner = BannerAd(
+    size: AdSize.banner,
+    adUnitId: AdMobService.bannerAdUnitId!,
+    listener: AdMobService.bannerListener,
+    request: const AdRequest(),
+  )..load();
+}
 
-  final List<String> filteredCategories = [];
+void _createInterstitialAd() {
+  InterstitialAd.load(
+    adUnitId: AdMobService.interstitialAdUnitId!,
+    request: const AdRequest(),
+    adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) => _interstitialAd = ad,
+        onAdFailedToLoad: (LoadAdError error) => _interstitialAd = null),
+  );
+}
 
-  final TextEditingController searchController = TextEditingController();
+void _showInterstitialAd() {
+  if (_interstitialAd != null) {
+    _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
+      onAdDismissedFullScreenContent: (ad) {
+        ad.dispose();
+        _createInterstitialAd();
+      },
+      onAdFailedToShowFullScreenContent: (ad, error) {
+        ad.dispose();
+        _createInterstitialAd();
+      },
+    );
+    _interstitialAd!.show();
+    _interstitialAd = null;
+  }
+}
 
-  // bool showSearchBox = true;
-  // bool categoryFound = true;
+Future<void> shareQuotes(String imageUrl) async {
+  try {
+    RenderRepaintBoundary boundary =
+        _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+    ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+    ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+
+    if (byteData != null) {
+      Uint8List pngBytes = byteData.buffer.asUint8List();
+      final tempDir = await getTemporaryDirectory();
+      final filePath = '${tempDir.path}/Image.png';
+      final file = File(filePath);
+
+      await file.writeAsBytes(pngBytes);
+
+      await Share.shareFiles([filePath]);
+    }
+    // ignore: empty_catches
+  } catch (e) {}
+}
+
+class CategoryPage extends StatefulWidget {
+  final String reference;
+  const CategoryPage({required this.reference, Key? key}) : super(key: key);
 
   @override
+  CategoryPageState createState() => CategoryPageState();
+}
+
+class CategoryPageState extends State<CategoryPage> {
+  late Reference categoryRef;
+
+  List<Reference> categoryRefs = [];
+  @override
   void initState() {
-    filteredCategories.addAll(categories);
     super.initState();
     _createBannerAd();
     _createInterstitialAd();
+    _loadFavoriteImages();
+    loadNativeAd();
+    categoryRef = storage.ref().child(widget.reference);
+    shuffleImages();
   }
 
-  BannerAd? _banner;
-  InterstitialAd? _interstitialAd;
-  void _createBannerAd() {
-    _banner = BannerAd(
-      size: AdSize.fullBanner,
-      adUnitId: AdMobService.bannerAdUnitId!,
-      listener: AdMobService.bannerListener,
-      request: const AdRequest(),
-    )..load();
+  Future<void> _loadFavoriteImages() async {
+    _prefs = await SharedPreferences.getInstance();
+    setState(() {
+      favoriteImages = _prefs.getStringList('favoriteImages') ?? [];
+    });
   }
 
-  void _createInterstitialAd() {
-    InterstitialAd.load(
-      adUnitId: AdMobService.interstitialAdUnitId!,
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-          onAdLoaded: (ad) => _interstitialAd = ad,
-          onAdFailedToLoad: (LoadAdError error) => _interstitialAd = null),
-    );
+  void toggleFavorite(String imageUrl) {
+    setState(() {
+      if (favoriteImages.contains(imageUrl)) {
+        favoriteImages.remove(imageUrl);
+      } else {
+        favoriteImages.add(imageUrl);
+      }
+    });
+    _prefs.setStringList('favoriteImages', favoriteImages);
   }
 
-  void _showInterstitialAd() {
-    if (_interstitialAd != null) {
-      _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
-        onAdDismissedFullScreenContent: (ad) {
-          ad.dispose();
-          _createInterstitialAd();
-        },
-        onAdFailedToShowFullScreenContent: (ad, error) {
-          ad.dispose();
-          _createInterstitialAd();
-        },
-      );
-      _interstitialAd!.show();
-      _interstitialAd = null;
+  NativeAd? _nativeAd;
+  bool _nativeAdIsLoaded = false;
+
+  void loadNativeAd() {
+    _nativeAd = NativeAd(
+        adUnitId: AdMobService.nativeAdsUnit!,
+        listener: NativeAdListener(
+          onAdLoaded: (ad) {
+            setState(() {
+              _nativeAdIsLoaded = true;
+            });
+          },
+          onAdFailedToLoad: (ad, error) {
+            ad.dispose();
+          },
+          onAdClicked: (ad) {},
+          onAdImpression: (ad) {},
+          onAdClosed: (ad) {},
+          onAdOpened: (ad) {},
+          onAdWillDismissScreen: (ad) {},
+          onPaidEvent: (ad, valueMicros, precision, currencyCode) {},
+        ),
+        request: const AdRequest(),
+        nativeTemplateStyle:
+            NativeTemplateStyle(templateType: TemplateType.medium),
+        customOptions: {});
+    _nativeAd?.load();
+  }
+
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  Map<Reference, String> cachedDownloadUrls = {};
+  Future<void> shuffleImages() async {
+    final ListResult result = await categoryRef.listAll();
+    final shuffledRefs = result.items.toList()..shuffle();
+    if (mounted) {
+      setState(() {
+        categoryRefs = shuffledRefs;
+        cachedDownloadUrls.clear();
+      });
     }
+  }
+
+  Future<void> refreshImages() async {
+    await shuffleImages();
   }
 
   @override
   Widget build(BuildContext context) {
     Color backgroundColour = Theme.of(context).colorScheme.background;
-    Color primaryColour = Theme.of(context).colorScheme.primary;
     Color secondaryColour = Theme.of(context).colorScheme.secondary;
+
+    String categoryTitle = widget.reference.split('/').last;
+    categoryTitle = categoryTitle.substring(0, 1).toUpperCase() +
+        categoryTitle.substring(1);
+
     return Scaffold(
+      bottomNavigationBar: _banner == null
+          ? const SizedBox(
+              height: 0,
+            )
+          : SizedBox(
+              height: 52,
+              child: AdWidget(ad: _banner!),
+            ),
       appBar: AppBar(
-        // centerTitle: true,
-        backgroundColor: backgroundColour,
         iconTheme: Theme.of(context).iconTheme,
-        elevation: 0,
+        elevation: 8,
+        backgroundColor: backgroundColour,
         title: Text(
-          "Browse Categories",
+          categoryTitle,
           style: GoogleFonts.kanit(
-            fontSize: 22,
             color: secondaryColour,
+            fontSize: 22,
           ),
         ),
       ),
+      key: _scaffoldKey,
       backgroundColor: backgroundColour,
       body: SafeArea(
         child: Column(
           children: [
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.012,
-            ),
-            // buildSearchBox(),
-
             Expanded(
-              child: ListView.builder(
-                itemCount: (filteredCategories.length / 2).ceil(),
-                itemBuilder: (BuildContext context, int index) {
-                  final rowIndex = index * 2;
-                  final category1 = filteredCategories[rowIndex];
-                  final category2 = (rowIndex + 1 < filteredCategories.length)
-                      ? filteredCategories[rowIndex + 1]
-                      : null;
-                  return AnimationConfiguration.staggeredList(
-                    position: index,
-                    duration: const Duration(milliseconds: 375),
-                    child: SlideAnimation(
-                      verticalOffset: 50.0,
-                      child: FadeInAnimation(
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(10, 4, 10, 4),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Expanded(
-                                child: GestureDetector(
-                                  child: Container(
-                                    height: MediaQuery.of(context).size.height *
-                                        0.12,
-                                    decoration: BoxDecoration(
-                                      color: primaryColour.withOpacity(0.6),
-                                      borderRadius: BorderRadius.circular(6),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: primaryColour.withOpacity(0.1),
-                                          blurRadius: 6,
-                                          offset: const Offset(1, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        const SizedBox(width: 5),
-                                        Expanded(
-                                          child: Text(
-                                            category1,
-                                            style: GoogleFonts.kanit(
-                                              color: secondaryColour,
-                                              fontSize: 16,
-                                            ),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: _buildCachedImage(
-                                              _imageReferences1[index]),
-                                        ),
-                                        const SizedBox(width: 10),
-                                      ],
-                                    ),
-                                  ),
-                                  onTap: () {
-                                    _showInterstitialAd();
-                                    _navigateToCategoryPage(category1);
-                                  },
-                                  // onTap: () => _navigateToCategoryPage(category1),
-                                ),
-                              ),
-                              if (category2 != null) const SizedBox(width: 10),
-                              if (category2 != null)
-                                Expanded(
-                                  child: GestureDetector(
-                                    child: Container(
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.12,
-                                      decoration: BoxDecoration(
-                                        color: primaryColour.withOpacity(0.6),
-                                        border: Border.all(
-                                            width: 0.2,
-                                            color: Colors.transparent),
-                                        borderRadius: BorderRadius.circular(6),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color:
-                                                primaryColour.withOpacity(0.1),
-                                            blurRadius: 6,
-                                            offset: const Offset(1, 2),
-                                          ),
-                                        ],
-                                      ),
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          const SizedBox(width: 5),
-                                          Expanded(
-                                            child: Text(
-                                              category2,
-                                              style: GoogleFonts.kanit(
-                                                color: secondaryColour,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: _buildCachedImage(
-                                                _imageReferences2[index]),
-                                          ),
-                                          const SizedBox(width: 10),
-                                        ],
-                                      ),
-                                    ),
-                                    onTap: () {
-                                      _navigateToCategoryPage(category2);
-                                    },
-                                    // onTap: () => _navigateToCategoryPage(category2),
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
+              child: RefreshIndicator(
+                backgroundColor: Theme.of(context).colorScheme.background,
+                color: Theme.of(context).colorScheme.primary,
+                onRefresh: shuffleImages,
+                child: CustomScrollView(
+                  physics: const ClampingScrollPhysics(),
+                  slivers: <Widget>[
+                    SliverGrid(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 1,
+                        childAspectRatio: 0.8,
+                      ),
+                      delegate: SliverChildBuilderDelegate(
+                        (BuildContext context, int index) {
+                          final reference = categoryRefs[index];
+                          final cachedUrl = cachedDownloadUrls[reference];
+                          if (cachedUrl != null) {
+                            return _buildImageWidget(cachedUrl);
+                          } else {
+                            return FutureBuilder<String>(
+                              future: reference.getDownloadURL(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Components.buildPlaceholder();
+                                } else if (snapshot.hasError) {
+                                  return Components.buildErrorWidget();
+                                } else if (snapshot.hasData) {
+                                  final downloadUrl = snapshot.data!;
+                                  cachedDownloadUrls[reference] = downloadUrl;
+                                  return _buildImageWidget(downloadUrl);
+                                } else {
+                                  return Container();
+                                }
+                              },
+                            );
+                          }
+                        },
+                        childCount: categoryRefs.length,
                       ),
                     ),
-                  );
-                },
+                  ],
+                ),
               ),
             ),
           ],
         ),
       ),
-      bottomNavigationBar: _banner == null
-          ? null
-          : SizedBox(
-              height: 52,
-              child: AdWidget(ad: _banner!),
-            ),
     );
   }
 
-  Widget _buildCachedImage(String imageReference) {
-    final ref = storage.ref().child(imageReference);
-    return FutureBuilder<String>(
-      future: ref.getDownloadURL(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done &&
-            snapshot.hasData) {
-          final imageUrl = snapshot.data!;
-          return ClipRRect(
-            borderRadius: BorderRadius.circular(6),
-            child: CachedNetworkImage(
-              imageUrl: imageUrl,
-              height: MediaQuery.of(context).size.height * 0.1,
-              width: MediaQuery.of(context).size.height * 0.1,
-              fit: BoxFit.cover,
-              errorWidget: (context, url, error) => const Icon(Icons.error),
+  Widget _buildImageWidget(String imageUrl) {
+    Color primaryColour = Theme.of(context).colorScheme.primary;
+    final heroTag = 'image_hero_$imageUrl';
+    return Hero(
+      tag: heroTag,
+      child: GestureDetector(
+        onTap: () {
+          _showFullScreenImage(imageUrl, heroTag);
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 14),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8.0),
+              boxShadow: [
+                BoxShadow(
+                  color: primaryColour.withOpacity(0.2),
+                  blurRadius: 1,
+                  offset: const Offset(0, 0),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: CachedNetworkImage(
+                fadeInDuration: const Duration(milliseconds: 100),
+                fadeOutDuration: const Duration(milliseconds: 100),
+                imageUrl: imageUrl,
+                placeholder: (context, url) => Components.buildPlaceholder(),
+                errorWidget: (context, url, error) =>
+                    Components.buildErrorWidget(),
+                fit: BoxFit.cover,
+                cacheManager: DefaultCacheManager(),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showFullScreenImage(
+    String imageUrl,
+    String heroTag,
+  ) {
+    Color backgroundColour = Theme.of(context).colorScheme.background;
+    final heroTag = 'image_hero_$imageUrl';
+
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        opaque: false,
+        pageBuilder: (BuildContext context, _, __) {
+          return Scaffold(
+            backgroundColor: backgroundColour,
+            body: SafeArea(
+              child: GestureDetector(
+                onVerticalDragEnd: (details) {
+                  if (details.primaryVelocity! > 0) {
+                    Navigator.of(context).pop();
+                  }
+                },
+                child: Stack(
+                  children: [
+                    Container(
+                      color: backgroundColour,
+                      child: Center(
+                        child: Hero(
+                          tag: heroTag,
+                          child: RepaintBoundary(
+                            key: _globalKey,
+                            child: CachedNetworkImage(
+                              imageUrl: imageUrl,
+                              placeholder: (context, url) =>
+                                  Components.buildPlaceholder(),
+                              errorWidget: (context, url, error) =>
+                                  const Icon(Icons.error),
+                              fit: BoxFit.contain,
+                              cacheManager: DefaultCacheManager(),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      right: 10.0,
+                      bottom: 10.0,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              FloatingActionButton(
+                                backgroundColor: backgroundColour,
+                                heroTag: 2,
+                                onPressed: () {
+                                  _showInterstitialAd();
+                                  savetoGallery(context);
+                                },
+                                child: Icon(
+                                  Iconsax.arrow_down,
+                                  color:
+                                      Theme.of(context).colorScheme.secondary,
+                                ),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              FloatingActionButton.extended(
+                                backgroundColor: backgroundColour,
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => InspirioEditor(
+                                        imageUrl: imageUrl,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                label: Text(
+                                  'Edit',
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary),
+                                ),
+                                icon: Icon(
+                                  Iconsax.edit,
+                                  color:
+                                      Theme.of(context).colorScheme.secondary,
+                                ),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              FloatingActionButton.extended(
+                                backgroundColor: backgroundColour,
+                                onPressed: () {
+                                  _showInterstitialAd();
+                                  shareQuotes(imageUrl);
+                                },
+                                heroTag: 3,
+                                icon: Icon(
+                                  Iconsax.share,
+                                  color:
+                                      Theme.of(context).colorScheme.secondary,
+                                ),
+                                label: Text(
+                                  'Share',
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           );
-        } else {
-          return const SizedBox();
-        }
-      },
+        },
+      ),
     );
-  }
-
-  // Widget buildSearchBox() {
-  //   Color primaryColour = Theme.of(context).colorScheme.primary;
-  //   Color secondaryColour = Theme.of(context).colorScheme.secondary;
-  //   return Padding(
-  //     padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-  //     child: Container(
-  //       width: MediaQuery.of(context).size.width * 0.88,
-  //       height: MediaQuery.of(context).size.height * 0.056,
-  //       decoration: BoxDecoration(
-  //         color: primaryColour.withOpacity(0.1),
-  //         borderRadius: BorderRadius.circular(10),
-  //         boxShadow: [
-  //           BoxShadow(
-  //             color: Colors.grey.withOpacity(0.5),
-  //             spreadRadius: 2,
-  //             blurRadius: 5,
-  //             offset: const Offset(0, 3),
-  //           ),
-  //         ],
-  //       ),
-  //       child: Padding(
-  //         padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-  //         child: Row(
-  //           children: [
-  //             Expanded(
-  //               child: TextField(
-  //                 controller: searchController,
-  //                 style: GoogleFonts.kanit(
-  //                   fontSize: 18,
-  //                   color: secondaryColour,
-  //                 ),
-  //                 decoration: InputDecoration(
-  //                   hintText: 'Which Category you are lookin for...',
-  //                   hintStyle: GoogleFonts.kanit(
-  //                     color: secondaryColour.withOpacity(0.8),
-  //                     fontSize: 16,
-  //                   ),
-  //                   border: InputBorder.none,
-  //                   suffixIcon: IconButton(
-  //                     icon: const Icon(
-  //                       Icons.clear,
-  //                       color: Colors.grey,
-  //                     ),
-  //                     onPressed: () {
-  //                       searchController.clear();
-  //                       filterCategories('');
-  //                       setState(() {
-  //                         showSearchBox = false;
-  //                       });
-  //                     },
-  //                   ),
-  //                 ),
-  //                 onChanged: (value) {
-  //                   filterCategories(value);
-  //                 },
-  //                 onSubmitted: (value) {
-  //                   filterCategories(value);
-  //                 },
-  //                 cursorColor: const Color(0xFF831A2B),
-  //                 cursorRadius: const Radius.circular(20),
-  //                 cursorWidth: 3,
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  // void filterCategories(String query) {
-  //   setState(() {
-  //     if (query.isEmpty) {
-  //       filteredCategories.clear();
-  //       filteredCategories.addAll(categories);
-  //     } else {
-  //       filteredCategories.clear();
-  //       filteredCategories.addAll(categories.where((category) =>
-  //           category.toLowerCase().contains(query.toLowerCase())));
-  //     }
-
-  //     categoryFound = filteredCategories.isNotEmpty;
-  //   });
-  // }
-}
-
-void _navigateToCategoryPage(String category) {
-  switch (category) {
-    case 'Morning':
-      Get.to(
-          () => const CategoryPage(
-                reference: 'home/morning',
-              ),
-          transition: Transition.leftToRightWithFade);
-      break;
-    case 'Night':
-      Get.to(
-          () => const CategoryPage(
-                reference: 'category/night',
-              ),
-          transition: Transition.rightToLeftWithFade);
-      break;
-    case 'Birthday':
-      Get.to(
-          () => const CategoryPage(
-                reference: 'category/birthday',
-              ),
-          transition: Transition.leftToRightWithFade);
-      break;
-    case 'Inspirational':
-      Get.to(
-          () => const CategoryPage(
-                reference: "category/inspirational",
-              ),
-          transition: Transition.rightToLeftWithFade);
-      break;
-    case 'Religious':
-      Get.to(
-          () => const CategoryPage(
-                reference: "category/religious",
-              ),
-          transition: Transition.leftToRightWithFade);
-      break;
-    case 'Leadership':
-      Get.to(
-          () => const CategoryPage(
-                reference: "category/leadership",
-              ),
-          transition: Transition.rightToLeftWithFade);
-      break;
-    case 'Avengers':
-      Get.to(
-          () => const CategoryPage(
-                reference: "category/avengers",
-              ),
-          transition: Transition.leftToRightWithFade);
-      break;
-    case 'Happiness':
-      Get.to(
-          () => const CategoryPage(
-                reference: "category/happiness",
-              ),
-          transition: Transition.rightToLeftWithFade);
-      break;
-    case 'Movies':
-      Get.to(
-          () => const CategoryPage(
-                reference: "category/movies",
-              ),
-          transition: Transition.leftToRightWithFade);
-      break;
-    case 'Hindi':
-      Get.to(
-          () => const CategoryPage(
-                reference: "home/hindi",
-              ),
-          transition: Transition.rightToLeftWithFade);
-      break;
-    case 'Best Wishes':
-      Get.to(
-          () => const CategoryPage(
-                reference: "category/bestwishes",
-              ),
-          transition: Transition.leftToRightWithFade);
-      break;
-    case 'Friendship':
-      Get.to(
-          () => const CategoryPage(
-                reference: "category/friendship",
-              ),
-          transition: Transition.rightToLeftWithFade);
-      break;
-
-    case 'Success':
-      Get.to(
-          () => const CategoryPage(
-                reference: "category/success",
-              ),
-          transition: Transition.leftToRightWithFade);
-      break;
-    case 'Motivational':
-      Get.to(
-          () => const CategoryPage(
-                reference: "home/motivational",
-              ),
-          transition: Transition.rightToLeftWithFade);
-      break;
-
-    case 'Fitness':
-      Get.to(
-          () => const CategoryPage(
-                reference: "category/fitness",
-              ),
-          transition: Transition.leftToRightWithFade);
-      break;
-    case 'Nature':
-      Get.to(
-          () => const CategoryPage(
-                reference: "category/nature",
-              ),
-          transition: Transition.rightToLeftWithFade);
-      break;
-    case 'Courage':
-      Get.to(
-          () => const CategoryPage(
-                reference: "category/courage",
-              ),
-          transition: Transition.leftToRightWithFade);
-      break;
-    case 'Business':
-      Get.to(
-          () => const CategoryPage(
-                reference: "category/business",
-              ),
-          transition: Transition.rightToLeftWithFade);
-      break;
-    case 'Power':
-      Get.to(
-          () => const CategoryPage(
-                reference: "category/power",
-              ),
-          transition: Transition.leftToRightWithFade);
-      break;
-    case 'Wisdom':
-      Get.to(
-          () => const CategoryPage(
-                reference: "category/wisdom",
-              ),
-          transition: Transition.rightToLeftWithFade);
-      break;
-    default:
-      break;
   }
 }

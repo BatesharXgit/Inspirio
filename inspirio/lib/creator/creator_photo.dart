@@ -6,7 +6,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 // ignore: depend_on_referenced_packages
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
@@ -14,7 +13,6 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:inspirio/components/widgets.dart';
 import 'package:inspirio/services/admob_services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:ui' as ui;
@@ -131,15 +129,8 @@ class InspirioEditorState extends State<InspirioEditor>
     // adProvider.initializeFullPageAds();
   }
 
-  BannerAd? _banner;
   InterstitialAd? _interstitialAd;
   void _createBannerAd() {
-    _banner = BannerAd(
-      size: AdSize.banner,
-      adUnitId: AdMobService.bannerAdUnitId!,
-      listener: AdMobService.bannerListener,
-      request: const AdRequest(),
-    )..load();
   }
 
   void _createInterstitialAd() {
@@ -220,6 +211,7 @@ class InspirioEditorState extends State<InspirioEditor>
     Color backgroundColour = Theme.of(context).colorScheme.background;
     Color primaryColour = Theme.of(context).colorScheme.primary;
     Color secondaryColour = Theme.of(context).colorScheme.secondary;
+    // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () => _onBackPressed(),
       child: Scaffold(
@@ -679,8 +671,8 @@ class ImageStackState extends State<ImageStack> {
                       bottom: 2,
                       left: 20,
                       child: Container(
-                        padding: EdgeInsets.all(24),
-                        margin: EdgeInsets.fromLTRB(0, 0, 0, 8),
+                        padding: const EdgeInsets.all(24),
+                        margin: const EdgeInsets.fromLTRB(0, 0, 0, 8),
                         decoration: BoxDecoration(
                             color: Colors.black,
                             shape: BoxShape.circle,
@@ -688,7 +680,7 @@ class ImageStackState extends State<ImageStack> {
                               width: 2,
                               color: Colors.white,
                             )),
-                        child: Icon(
+                        child: const Icon(
                           Icons.person,
                           size: 42,
                         ),

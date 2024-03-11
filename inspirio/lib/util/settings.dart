@@ -5,9 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:inspirio/themes/theme.dart';
-import 'package:inspirio/util/theme_provider.dart';
-import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -100,11 +97,6 @@ class _SettingsPageState extends State<SettingsPage> {
     Color primaryColour = Theme.of(context).colorScheme.primary;
     Color secondaryColour = Theme.of(context).colorScheme.secondary;
     return Scaffold(
-      // appBar: AppBar(
-      //   backgroundColor: Theme.of(context).colorScheme.background,
-      //   elevation: 0,
-      //   title: Text('Settings'),
-      // ),
       backgroundColor: backgroundColour,
       body: Column(
         children: [
@@ -115,7 +107,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.05),
                     if (userName != null && userEmail != null)
                       Column(
                         children: [

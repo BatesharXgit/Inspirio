@@ -5,9 +5,10 @@ class Components {
   static Widget buildPlaceholder() {
     return Center(
       child: Builder(builder: (context) {
+        Color primaryColour = Theme.of(context).colorScheme.primary;
         return LoadingAnimationWidget.beat(
           size: 35,
-          color: Theme.of(context).colorScheme.primary,
+          color: primaryColour,
           // leftDotColor: Theme.of(context).colorScheme.primary,
           // rightDotColor: Theme.of(context).colorScheme.secondary
         );
@@ -25,11 +26,13 @@ class Components {
   static Widget buildCircularIndicator() {
     return Center(
       child: Builder(builder: (context) {
+        Color primaryColour = Theme.of(context).colorScheme.primary;
         return LoadingAnimationWidget.fourRotatingDots(
           size: 35,
-          color: Theme.of(context).colorScheme.primary,
+          color: primaryColour,
         );
       }),
     );
   }
+  
 }

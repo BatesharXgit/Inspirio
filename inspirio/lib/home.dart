@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:inspirio/pages/homepage.dart';
-import 'package:inspirio/pages/poetry.dart';
 import 'package:inspirio/status/screens/home_screen.dart';
-import 'pages/category.dart';
+import 'package:inspirio/util/settings.dart';
+import 'pages/quotes_category.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -56,23 +56,23 @@ class _HomePageState extends ConsumerState<HomePage> {
               Icons.home,
               color: primaryColour,
             ),
-            icon: Icon(Icons.home_outlined),
+            icon: const Icon(Icons.home_outlined),
             label: 'Home',
           ),
           NavigationDestination(
             selectedIcon: Icon(Icons.chat, color: primaryColour),
-            icon: Icon(Icons.chat_outlined),
+            icon: const Icon(Icons.chat_outlined),
             label: 'Status',
           ),
           NavigationDestination(
             selectedIcon: Icon(Icons.format_quote, color: primaryColour),
-            icon: Icon(Icons.format_quote_outlined),
+            icon: const Icon(Icons.format_quote_outlined),
             label: 'Quotes',
           ),
           NavigationDestination(
-            selectedIcon: Icon(Icons.history_edu, color: primaryColour),
-            icon: Icon(Icons.history_edu_outlined),
-            label: 'Poetry',
+            selectedIcon: Icon(Icons.settings, color: primaryColour),
+            icon: const Icon(Icons.settings_outlined),
+            label: 'Settings',
           ),
         ],
       ),
@@ -91,7 +91,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         _pages[index] = const Category();
         break;
       case 3:
-        _pages[index] = const PoetryPage();
+        _pages[index] = const SettingsPage();
         break;
       default:
         throw Exception('Invalid index');

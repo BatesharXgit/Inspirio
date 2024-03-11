@@ -9,14 +9,14 @@ class NoRecentStatusesFoundScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: EdgeInsets.all(8.0),
           child: Text(
             "You do not have seen any statuses yet, go and watch some statuses",
-            style: const TextStyle(fontSize: 17),
+            style: TextStyle(fontSize: 17),
           ),
         ),
         LaunchApp(

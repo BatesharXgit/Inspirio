@@ -3,11 +3,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:inspirio/authentication/auth%20pages/auth_page.dart';
 import 'package:inspirio/home.dart';
 import 'package:inspirio/pages/homepage.dart';
 import 'package:inspirio/status/providers.dart';
 import 'package:inspirio/themes/theme.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 
@@ -20,7 +20,6 @@ Future<void> main() async {
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
-  final prefs = await SharedPreferences.getInstance();
   await FirebaseAppCheck.instance.activate(
     androidProvider: AndroidProvider.playIntegrity,
   );
@@ -33,7 +32,7 @@ Future<void> main() async {
 }
 
 Future<void> preloadData() async {
-  final inspirioHome = const InspirioHome();
+  const inspirioHome = InspirioHome();
   await inspirioHome.initializeData();
 }
 
@@ -49,8 +48,8 @@ class MyApp extends ConsumerWidget {
       themeMode: ThemeMode.system,
       theme: kLightTheme,
       darkTheme: kAmoledTheme,
-      // home: const InspirioStatusSaver(),
-      home: HomePage(),
+      // home: const HomePage(),
+      home: const AuthPage(),
     );
   }
 

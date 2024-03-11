@@ -22,12 +22,12 @@ ThemeData kLightTheme = ThemeData(
       color: Color(0xFF131321),
     ));
 
-ThemeData kColouredTheme = ThemeData(
-    brightness: Brightness.dark,
-    colorScheme: const ColorScheme.dark(
-      background: Color(0xFF131321),
-      primary: Color(0xFFFE5163),
-      secondary: Colors.white,
-      tertiary: Colors.white,
-    ),
-    iconTheme: const IconThemeData(color: Colors.white));
+// ThemeData kColouredTheme = ThemeData(
+//     brightness: Brightness.dark,
+//     colorScheme: const ColorScheme.dark(
+//       background: Color(0xFF131321),
+//       primary: Color(0xFFFE5163),
+//       secondary: Colors.white,
+//       tertiary: Colors.white,
+//     ),
+//     iconTheme: const IconThemeData(color: Colors.white));

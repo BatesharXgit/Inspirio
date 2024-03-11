@@ -1,4 +1,3 @@
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:inspirio/status/providers.dart';
@@ -70,9 +69,6 @@ class _InspirioStatusSaverState extends ConsumerState<InspirioStatusSaver>
 
   @override
   Widget build(BuildContext context) {
-    Color primaryColour = Theme.of(context).colorScheme.primary;
-
-    Color backgroundColour = Theme.of(context).colorScheme.background;
     Color secondaryColour = Theme.of(context).colorScheme.secondary;
     final storagePermissionStatus = ref.watch(storagePermissionProvider);
 
@@ -85,6 +81,8 @@ class _InspirioStatusSaverState extends ConsumerState<InspirioStatusSaver>
     return (storagePermissionStatus == PermissionStatus.granted)
         ? Scaffold(
             appBar: AppBar(
+              centerTitle: true,
+              forceMaterialTransparency: true,
               title: Text(
                 'WhatsApp Status',
                 style: GoogleFonts.cookie(
@@ -97,7 +95,7 @@ class _InspirioStatusSaverState extends ConsumerState<InspirioStatusSaver>
               elevation: 4,
               bottom: TabBar(
                 controller: _tabController,
-                tabs: [
+                tabs: const [
                   MyTab(tabName: "Recent"),
                   MyTab(tabName: "Saved"),
                 ],

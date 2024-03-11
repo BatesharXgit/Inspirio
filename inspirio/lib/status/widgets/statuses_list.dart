@@ -63,7 +63,7 @@ class _StatusesListState extends State<StatusesList>
       if (widget.tabType == TabType.recent) {
         return const NoRecentStatusesFoundScreen();
       } else {
-        return NotFoundScreen(message: "No saved statuses");
+        return const NotFoundScreen(message: "No saved statuses");
       }
     });
   }

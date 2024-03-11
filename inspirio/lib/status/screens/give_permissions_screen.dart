@@ -12,25 +12,25 @@ class GivePermissionsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         elevation: 3.5,
-        title: Text("Inspirio Status Saver"),
+        title: const Text("Inspirio Status Saver"),
         centerTitle: true,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
+          const Padding(
+            padding: EdgeInsets.all(8.0),
             child: Text(
               "Give storage permission",
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
               ),
             ),
           ),
           ElevatedButton(
-            child: Text("Give storage permission"),
+            child: const Text("Give storage permission"),
             onPressed: () {
               storagePermissionNotifier.requestAndHandle(context);
             },

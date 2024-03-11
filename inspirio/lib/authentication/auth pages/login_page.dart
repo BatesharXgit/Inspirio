@@ -34,9 +34,9 @@ class _LoginPageState extends State<LoginPage> {
               Center(
                 child: Text(
                   'Inspirio',
-                  style: GoogleFonts.orbitron(
+                  style: GoogleFonts.cookie(
                     color: Colors.white,
-                    fontSize: 50,
+                    fontSize: 74,
                   ),
                 ),
               ),
@@ -44,7 +44,7 @@ class _LoginPageState extends State<LoginPage> {
               Align(
                 alignment: Alignment.center,
                 child: Text(
-                  ('"Step into a World of Wall Artistry: \n       Your Screens, Our Canvas!"'),
+                  ('"Create, Share, Download: \n   Posts, Status, Stories!"'),
                   style: GoogleFonts.kanit(color: Colors.white, fontSize: 18),
                 ),
               ),

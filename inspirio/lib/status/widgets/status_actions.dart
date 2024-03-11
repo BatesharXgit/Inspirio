@@ -1,5 +1,4 @@
 import 'package:chewie/chewie.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:inspirio/status/common.dart';
 import 'package:inspirio/status/providers.dart';
@@ -28,7 +27,7 @@ class StatusActions extends ConsumerWidget {
           showToast(getMessage: () => "Saved");
         },
         icon: const Icon(Icons.file_download_rounded),
-        label: Text("Save"),
+        label: const Text("Save"),
       ));
     }
 
@@ -41,7 +40,7 @@ class StatusActions extends ConsumerWidget {
           Share.shareFiles([statusPath], subject: 'Whatsapp Status');
         },
         icon: const Icon(Icons.share_rounded),
-        label: Text("Share"),
+        label: const Text("Share"),
       )
     ]);
 
@@ -70,10 +69,10 @@ class DeleteAction extends ConsumerWidget {
           context: context,
           barrierDismissible: false,
           builder: (context) => AlertDialog(
-            title: Text("Delete Status"),
-            content: Text(
+            title: const Text("Delete Status"),
+            content: const Text(
               "Delete Status",
-              style: const TextStyle(fontSize: 18),
+              style: TextStyle(fontSize: 18),
             ),
             actions: [
               TextButton(
@@ -83,7 +82,7 @@ class DeleteAction extends ConsumerWidget {
                     chewieController?.play();
                   }
                 },
-                child: Text("CANCEL"),
+                child: const Text("CANCEL"),
               ),
               TextButton(
                 onPressed: () {
@@ -101,7 +100,7 @@ class DeleteAction extends ConsumerWidget {
                   );
                   // Navigator.pop(context);
                 },
-                child: Text("DELETE"),
+                child: const Text("DELETE"),
               ),
             ],
           ),

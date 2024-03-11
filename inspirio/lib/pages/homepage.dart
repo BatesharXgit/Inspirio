@@ -14,6 +14,7 @@ import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:inspirio/components/widgets.dart';
 import 'package:inspirio/creator/creator.dart';
 import 'package:inspirio/creator/creator_photo.dart';
+import 'package:inspirio/pages/quotes_category.dart';
 import 'package:inspirio/services/admob_services.dart';
 import 'package:inspirio/util/settings.dart';
 import 'package:path_provider/path_provider.dart';
@@ -190,11 +191,15 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
       _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
         onAdDismissedFullScreenContent: (ad) {
           ad.dispose();
-          _createInterstitialAd();
+          Future.delayed(const Duration(minutes: 1), () {
+            _createInterstitialAd();
+          });
         },
         onAdFailedToShowFullScreenContent: (ad, error) {
           ad.dispose();
-          _createInterstitialAd();
+          Future.delayed(const Duration(minutes: 1), () {
+            _createInterstitialAd();
+          });
         },
       );
       _interstitialAd!.show();
@@ -236,55 +241,53 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
   }
 
   Future<void> refreshPopularImages() async {
-    final ListResult result2 = await popularRef.listAll();
-    final List<Reference> shuffledpopularRefs = result2.items.toList()
-      ..shuffle();
+    final ListResult result = await popularRef.listAll();
+    final shuffledRefs = result.items.toList()..shuffle();
+
     if (mounted) {
       setState(() {
-        popularRefs = shuffledpopularRefs;
+        popularRefs = shuffledRefs;
+        cachedDownloadUrls.clear();
       });
     }
   }
 
   Future<void> refreshHindiImages() async {
-    final ListResult result3 = await hindiRef.listAll();
-    final List<Reference> shuffledhindiRefs = result3.items.toList()..shuffle();
+    final ListResult result = await hindiRef.listAll();
+    final shuffledRefs = result.items.toList()..shuffle();
     if (mounted) {
       setState(() {
-        hindiRefs = shuffledhindiRefs;
+        hindiRefs = shuffledRefs;
       });
     }
   }
 
   Future<void> refreshMorningImages() async {
-    final ListResult result4 = await morningRef.listAll();
-    final List<Reference> shuffledmorningRefs = result4.items.toList()
-      ..shuffle();
+    final ListResult result = await morningRef.listAll();
+    final shuffledRefs = result.items.toList()..shuffle();
     if (mounted) {
       setState(() {
-        morningRefs = shuffledmorningRefs;
+        morningRefs = shuffledRefs;
       });
     }
   }
 
   Future<void> refreshMotivationalImages() async {
-    final ListResult result6 = await motivationalRef.listAll();
-    final List<Reference> shuffledmotivationalRefs = result6.items.toList()
-      ..shuffle();
+    final ListResult result = await motivationalRef.listAll();
+    final shuffledRefs = result.items.toList()..shuffle();
     if (mounted) {
       setState(() {
-        motivationalRefs = shuffledmotivationalRefs;
+        motivationalRefs = shuffledRefs;
       });
     }
   }
 
   Future<void> refreshAttitudeImages() async {
-    final ListResult result8 = await attitudeRef.listAll();
-    final List<Reference> shuffledattitudeRefs = result8.items.toList()
-      ..shuffle();
+    final ListResult result = await attitudeRef.listAll();
+    final shuffledRefs = result.items.toList()..shuffle();
     if (mounted) {
       setState(() {
-        attitudeRefs = shuffledattitudeRefs;
+        attitudeRefs = shuffledRefs;
       });
     }
   }
@@ -296,7 +299,6 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
   @override
   Widget build(BuildContext context) {
     Color backgroundColour = Theme.of(context).colorScheme.background;
-    Color primaryColour = Theme.of(context).colorScheme.primary;
     Color secondaryColour = Theme.of(context).colorScheme.secondary;
     return MaterialApp(
       home: Scaffold(
@@ -323,9 +325,8 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
                         background: Container(
                           color: backgroundColour,
                           child: Padding(
-                            padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                            padding: const EdgeInsets.fromLTRB(20, 0, 10, 10),
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Text(
@@ -335,19 +336,6 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
                                     color: secondaryColour,
                                     fontSize: 44,
                                     // fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.settings,
-                                    color: secondaryColour,
-                                    size: 28,
-                                  ),
-                                  onPressed: () => Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const SettingsPage(),
-                                    ),
                                   ),
                                 ),
                               ],
@@ -373,7 +361,7 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
             _showInterstitialAd();
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => InspirioCreator(),
+                builder: (context) => const InspirioCreator(),
               ),
             );
           },
@@ -500,37 +488,45 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
   }
 
   Widget _buildPopularTab() {
-    Color backgroundColour = Theme.of(context).colorScheme.background;
-    Color primaryColour = Theme.of(context).colorScheme.primary;
     return RefreshIndicator(
-      backgroundColor: backgroundColour,
-      color: primaryColour,
-      onRefresh: refreshPopularImages,
+      backgroundColor: Theme.of(context).colorScheme.background,
+      color: Theme.of(context).colorScheme.primary,
+      onRefresh: refreshForYouImages,
       child: CustomScrollView(
+        physics: const ClampingScrollPhysics(),
         slivers: <Widget>[
           SliverGrid(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 1,
               childAspectRatio: 0.8,
             ),
-            delegate:
-                SliverChildBuilderDelegate((BuildContext context, int index) {
-              final pl = popularRefs[index];
-              return FutureBuilder<String>(
-                future: pl.getDownloadURL(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Components.buildPlaceholder();
-                  } else if (snapshot.hasError) {
-                    return Components.buildErrorWidget();
-                  } else if (snapshot.hasData) {
-                    return _buildImageWidget(snapshot.data!);
-                  } else {
-                    return Container();
-                  }
-                },
-              );
-            }),
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext context, int index) {
+                final reference = popularRefs[index];
+                final cachedUrl = cachedDownloadUrls[reference];
+                if (cachedUrl != null) {
+                  return _buildImageWidget(cachedUrl);
+                } else {
+                  return FutureBuilder<String>(
+                    future: reference.getDownloadURL(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Components.buildPlaceholder();
+                      } else if (snapshot.hasError) {
+                        return Components.buildErrorWidget();
+                      } else if (snapshot.hasData) {
+                        final downloadUrl = snapshot.data!;
+                        cachedDownloadUrls[reference] = downloadUrl;
+                        return _buildImageWidget(downloadUrl);
+                      } else {
+                        return Container();
+                      }
+                    },
+                  );
+                }
+              },
+              childCount: popularRefs.length,
+            ),
           ),
         ],
       ),
@@ -538,37 +534,45 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
   }
 
   Widget _buildHindiTab() {
-    Color backgroundColour = Theme.of(context).colorScheme.background;
-    Color primaryColour = Theme.of(context).colorScheme.primary;
     return RefreshIndicator(
-      backgroundColor: backgroundColour,
-      color: primaryColour,
-      onRefresh: refreshHindiImages,
+      backgroundColor: Theme.of(context).colorScheme.background,
+      color: Theme.of(context).colorScheme.primary,
+      onRefresh: refreshForYouImages,
       child: CustomScrollView(
+        physics: const ClampingScrollPhysics(),
         slivers: <Widget>[
           SliverGrid(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 1,
               childAspectRatio: 0.8,
             ),
-            delegate:
-                SliverChildBuilderDelegate((BuildContext context, int index) {
-              final hi = hindiRefs[index];
-              return FutureBuilder<String>(
-                future: hi.getDownloadURL(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Components.buildPlaceholder();
-                  } else if (snapshot.hasError) {
-                    return Components.buildErrorWidget();
-                  } else if (snapshot.hasData) {
-                    return _buildImageWidget(snapshot.data!);
-                  } else {
-                    return Container();
-                  }
-                },
-              );
-            }),
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext context, int index) {
+                final reference = hindiRefs[index];
+                final cachedUrl = cachedDownloadUrls[reference];
+                if (cachedUrl != null) {
+                  return _buildImageWidget(cachedUrl);
+                } else {
+                  return FutureBuilder<String>(
+                    future: reference.getDownloadURL(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Components.buildPlaceholder();
+                      } else if (snapshot.hasError) {
+                        return Components.buildErrorWidget();
+                      } else if (snapshot.hasData) {
+                        final downloadUrl = snapshot.data!;
+                        cachedDownloadUrls[reference] = downloadUrl;
+                        return _buildImageWidget(downloadUrl);
+                      } else {
+                        return Container();
+                      }
+                    },
+                  );
+                }
+              },
+              childCount: hindiRefs.length,
+            ),
           ),
         ],
       ),
@@ -577,32 +581,44 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
 
   Widget _buildMorningTab() {
     return RefreshIndicator(
-      onRefresh: refreshMorningImages,
+      backgroundColor: Theme.of(context).colorScheme.background,
+      color: Theme.of(context).colorScheme.primary,
+      onRefresh: refreshForYouImages,
       child: CustomScrollView(
+        physics: const ClampingScrollPhysics(),
         slivers: <Widget>[
           SliverGrid(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 1,
               childAspectRatio: 0.8,
             ),
-            delegate:
-                SliverChildBuilderDelegate((BuildContext context, int index) {
-              final mr = morningRefs[index];
-              return FutureBuilder<String>(
-                future: mr.getDownloadURL(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Components.buildPlaceholder();
-                  } else if (snapshot.hasError) {
-                    return Components.buildErrorWidget();
-                  } else if (snapshot.hasData) {
-                    return _buildImageWidget(snapshot.data!);
-                  } else {
-                    return Container();
-                  }
-                },
-              );
-            }),
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext context, int index) {
+                final reference = morningRefs[index];
+                final cachedUrl = cachedDownloadUrls[reference];
+                if (cachedUrl != null) {
+                  return _buildImageWidget(cachedUrl);
+                } else {
+                  return FutureBuilder<String>(
+                    future: reference.getDownloadURL(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Components.buildPlaceholder();
+                      } else if (snapshot.hasError) {
+                        return Components.buildErrorWidget();
+                      } else if (snapshot.hasData) {
+                        final downloadUrl = snapshot.data!;
+                        cachedDownloadUrls[reference] = downloadUrl;
+                        return _buildImageWidget(downloadUrl);
+                      } else {
+                        return Container();
+                      }
+                    },
+                  );
+                }
+              },
+              childCount: morningRefs.length,
+            ),
           ),
         ],
       ),
@@ -613,13 +629,12 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
   // }
 
   Widget _buildMotivationalTab() {
-    Color backgroundColour = Theme.of(context).colorScheme.background;
-    Color primaryColour = Theme.of(context).colorScheme.primary;
     return RefreshIndicator(
-      backgroundColor: backgroundColour,
-      color: primaryColour,
-      onRefresh: refreshMotivationalImages,
+      backgroundColor: Theme.of(context).colorScheme.background,
+      color: Theme.of(context).colorScheme.primary,
+      onRefresh: refreshForYouImages,
       child: CustomScrollView(
+        physics: const ClampingScrollPhysics(),
         slivers: <Widget>[
           SliverGrid(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -628,22 +643,30 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
             ),
             delegate: SliverChildBuilderDelegate(
               (BuildContext context, int index) {
-                final mo = motivationalRefs[index];
-                return FutureBuilder<String>(
-                  future: mo.getDownloadURL(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Components.buildPlaceholder();
-                    } else if (snapshot.hasError) {
-                      return Components.buildErrorWidget();
-                    } else if (snapshot.hasData) {
-                      return _buildImageWidget(snapshot.data!);
-                    } else {
-                      return Container();
-                    }
-                  },
-                );
+                final reference = motivationalRefs[index];
+                final cachedUrl = cachedDownloadUrls[reference];
+                if (cachedUrl != null) {
+                  return _buildImageWidget(cachedUrl);
+                } else {
+                  return FutureBuilder<String>(
+                    future: reference.getDownloadURL(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Components.buildPlaceholder();
+                      } else if (snapshot.hasError) {
+                        return Components.buildErrorWidget();
+                      } else if (snapshot.hasData) {
+                        final downloadUrl = snapshot.data!;
+                        cachedDownloadUrls[reference] = downloadUrl;
+                        return _buildImageWidget(downloadUrl);
+                      } else {
+                        return Container();
+                      }
+                    },
+                  );
+                }
               },
+              childCount: motivationalRefs.length,
             ),
           ),
         ],
@@ -652,13 +675,12 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
   }
 
   Widget _buildAttitudeTab() {
-    Color backgroundColour = Theme.of(context).colorScheme.background;
-    Color primaryColour = Theme.of(context).colorScheme.primary;
     return RefreshIndicator(
-      backgroundColor: backgroundColour,
-      color: primaryColour,
-      onRefresh: refreshAttitudeImages,
+      backgroundColor: Theme.of(context).colorScheme.background,
+      color: Theme.of(context).colorScheme.primary,
+      onRefresh: refreshForYouImages,
       child: CustomScrollView(
+        physics: const ClampingScrollPhysics(),
         slivers: <Widget>[
           SliverGrid(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -667,36 +689,39 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
             ),
             delegate: SliverChildBuilderDelegate(
               (BuildContext context, int index) {
-                final at = attitudeRefs[index];
-                return FutureBuilder<String>(
-                  future: at.getDownloadURL(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Components.buildPlaceholder();
-                    } else if (snapshot.hasError) {
-                      return Components.buildErrorWidget();
-                    } else if (snapshot.hasData) {
-                      return _buildImageWidget(snapshot.data!);
-                    } else {
-                      return Container();
-                    }
-                  },
-                );
+                final reference = attitudeRefs[index];
+                final cachedUrl = cachedDownloadUrls[reference];
+                if (cachedUrl != null) {
+                  return _buildImageWidget(cachedUrl);
+                } else {
+                  return FutureBuilder<String>(
+                    future: reference.getDownloadURL(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Components.buildPlaceholder();
+                      } else if (snapshot.hasError) {
+                        return Components.buildErrorWidget();
+                      } else if (snapshot.hasData) {
+                        final downloadUrl = snapshot.data!;
+                        cachedDownloadUrls[reference] = downloadUrl;
+                        return _buildImageWidget(downloadUrl);
+                      } else {
+                        return Container();
+                      }
+                    },
+                  );
+                }
               },
+              childCount: attitudeRefs.length,
             ),
           ),
         ],
       ),
     );
   }
-  // else {
-  //   return const Center(child: Text('No images available'));
-  // }
 
   Widget _buildImageWidget(String imageUrl) {
-    Color backgroundColour = Theme.of(context).colorScheme.background;
     Color primaryColour = Theme.of(context).colorScheme.primary;
-    Color secondaryColour = Theme.of(context).colorScheme.background;
     final heroTag = 'image_hero_$imageUrl';
     return Hero(
       tag: heroTag,
@@ -705,7 +730,7 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
           _showFullScreenImage(imageUrl, heroTag);
         },
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 14),
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8.0),
@@ -741,8 +766,6 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
     String heroTag,
   ) {
     Color backgroundColour = Theme.of(context).colorScheme.background;
-    Color primaryColour = Theme.of(context).colorScheme.primary;
-    Color secondaryColour = Theme.of(context).colorScheme.background;
     final heroTag = 'image_hero_$imageUrl';
 
     Navigator.of(context).push(
@@ -784,82 +807,81 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
                       right: 10.0,
                       bottom: 10.0,
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          FloatingActionButton(
-                            backgroundColor: primaryColour,
-                            onPressed: () {
-                              Navigator.pop(context);
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => InspirioEditor(
-                                    imageUrl: imageUrl,
-                                  ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              FloatingActionButton(
+                                backgroundColor: backgroundColour,
+                                heroTag: 2,
+                                onPressed: () {
+                                  _showInterstitialAd();
+                                  savetoGallery(context);
+                                },
+                                child: Icon(
+                                  Iconsax.arrow_down,
+                                  color:
+                                      Theme.of(context).colorScheme.secondary,
                                 ),
-                              );
-                            },
-                            child: Icon(
-                              Iconsax.pen_add,
-                              color: Theme.of(context).colorScheme.secondary,
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          FloatingActionButton(
-                            backgroundColor: primaryColour,
-                            onPressed: () {
-                              _showInterstitialAd();
-                              setState(() {
-                                if (favoriteImages.contains(imageUrl)) {
-                                  favoriteImages.remove(imageUrl);
-                                } else {
-                                  favoriteImages.add(imageUrl);
-                                }
-                              });
-                              _prefs.setStringList(
-                                  'favoriteImages', favoriteImages);
-                            },
-                            heroTag: 1,
-                            child: Icon(
-                              favoriteImages.contains(imageUrl)
-                                  ? Icons.favorite
-                                  : Icons.favorite_border,
-                              color: secondaryColour,
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          FloatingActionButton(
-                            backgroundColor: primaryColour,
-                            heroTag: 2,
-                            onPressed: () {
-                              _showInterstitialAd();
-                              savetoGallery(context);
-                            },
-                            child: Icon(
-                              Iconsax.arrow_down,
-                              color: Theme.of(context).colorScheme.secondary,
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          FloatingActionButton.extended(
-                            backgroundColor: primaryColour,
-                            onPressed: () {
-                              _showInterstitialAd();
-                              shareQuotes(imageUrl);
-                            },
-                            heroTag: 3,
-                            icon: Icon(
-                              Iconsax.share,
-                              color: secondaryColour,
-                            ),
-                            label: Text(
-                              'Share',
-                              style: TextStyle(color: secondaryColour),
-                            ),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              FloatingActionButton.extended(
+                                backgroundColor: backgroundColour,
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => InspirioEditor(
+                                        imageUrl: imageUrl,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                label: Text(
+                                  'Edit',
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary),
+                                ),
+                                icon: Icon(
+                                  Iconsax.edit,
+                                  color:
+                                      Theme.of(context).colorScheme.secondary,
+                                ),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              FloatingActionButton.extended(
+                                backgroundColor: backgroundColour,
+                                onPressed: () {
+                                  _showInterstitialAd();
+                                  shareQuotes(imageUrl);
+                                },
+                                heroTag: 3,
+                                icon: Icon(
+                                  Iconsax.share,
+                                  color:
+                                      Theme.of(context).colorScheme.secondary,
+                                ),
+                                label: Text(
+                                  'Share',
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
