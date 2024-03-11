@@ -14,9 +14,7 @@ import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:inspirio/components/widgets.dart';
 import 'package:inspirio/creator/creator.dart';
 import 'package:inspirio/creator/creator_photo.dart';
-import 'package:inspirio/pages/quotes_category.dart';
 import 'package:inspirio/services/admob_services.dart';
-import 'package:inspirio/util/settings.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:provider/provider.dart';
@@ -100,12 +98,12 @@ List<Reference> attitudeRefs = [];
 
 class InspirioHome extends ConsumerStatefulWidget {
   const InspirioHome({super.key});
-  static const numOfTabs = 2;
+  // static const numOfTabs = 2;
 
-  Future<void> initializeData() async {
-    final state = _InspirioHomeState();
-    await state.refreshForYouImages();
-  }
+  // Future<void> initializeData() async {
+  //   final state = _InspirioHomeState();
+  //   await state.refreshForYouImages();
+  // }
 
   @override
   ConsumerState<InspirioHome> createState() => _InspirioHomeState();
@@ -130,13 +128,11 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
   @override
   void initState() {
     super.initState();
-    _loadFavoriteImages();
     _createInterstitialAd();
     WidgetsBinding.instance.addObserver(this);
     _tabController = TabController(length: 6, vsync: this);
     _tabController.addListener(_handleTabSelection);
     refreshForYouImages();
-    isImageLoaded = true;
   }
 
   void _handleTabSelection() {
@@ -205,15 +201,6 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
       _interstitialAd!.show();
       _interstitialAd = null;
     }
-  }
-
-  late bool isImageLoaded = false;
-
-  Future<void> _loadFavoriteImages() async {
-    _prefs = await SharedPreferences.getInstance();
-    setState(() {
-      favoriteImages = _prefs.getStringList('favoriteImages') ?? [];
-    });
   }
 
   void toggleFavorite(String imageUrl) {
@@ -291,10 +278,6 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
       });
     }
   }
-
-  //banner Ads
-  //native Ad
-  //Interstitial Ad
 
   @override
   Widget build(BuildContext context) {
@@ -391,7 +374,7 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
         child: TabBar(
           dividerColor: Colors.transparent,
           tabAlignment: TabAlignment.start,
-          physics: const BouncingScrollPhysics(),
+          physics: const ClampingScrollPhysics(),
           indicatorPadding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
           controller: _tabController,
           indicatorColor: secondaryColour,
@@ -429,7 +412,7 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
   Widget _buildTabViews() {
     return TabBarView(
       controller: _tabController,
-      physics: const BouncingScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       children: [
         _buildForYouTab(),
         _buildPopularTab(),
@@ -830,12 +813,13 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
                                       Theme.of(context).colorScheme.secondary,
                                 ),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 10,
                               ),
                               FloatingActionButton.extended(
                                 backgroundColor: backgroundColour,
                                 onPressed: () {
+                                  _showInterstitialAd();
                                   Navigator.pop(context);
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
@@ -858,7 +842,7 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
                                       Theme.of(context).colorScheme.secondary,
                                 ),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 10,
                               ),
                               FloatingActionButton.extended(

@@ -4,8 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:inspirio/authentication/auth%20pages/auth_page.dart';
-import 'package:inspirio/home.dart';
-import 'package:inspirio/pages/homepage.dart';
 import 'package:inspirio/status/providers.dart';
 import 'package:inspirio/themes/theme.dart';
 import 'firebase_options.dart';
@@ -23,7 +21,7 @@ Future<void> main() async {
   await FirebaseAppCheck.instance.activate(
     androidProvider: AndroidProvider.playIntegrity,
   );
-  await preloadData();
+  // await preloadData();
   runApp(
     const ProviderScope(
       child: MyApp(),
@@ -31,10 +29,10 @@ Future<void> main() async {
   );
 }
 
-Future<void> preloadData() async {
-  const inspirioHome = InspirioHome();
-  await inspirioHome.initializeData();
-}
+// Future<void> preloadData() async {
+//   const inspirioHome = InspirioHome();
+//   await inspirioHome.initializeData();
+// }
 
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});

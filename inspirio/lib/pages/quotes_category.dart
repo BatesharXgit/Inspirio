@@ -92,6 +92,7 @@ class CategoryState extends State<Category> {
     )..load();
   }
 
+
   void _createInterstitialAd() {
     InterstitialAd.load(
       adUnitId: AdMobService.interstitialAdUnitId!,
@@ -107,11 +108,15 @@ class CategoryState extends State<Category> {
       _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
         onAdDismissedFullScreenContent: (ad) {
           ad.dispose();
-          _createInterstitialAd();
+          Future.delayed(const Duration(minutes: 1), () {
+            _createInterstitialAd();
+          });
         },
         onAdFailedToShowFullScreenContent: (ad, error) {
           ad.dispose();
-          _createInterstitialAd();
+          Future.delayed(const Duration(minutes: 1), () {
+            _createInterstitialAd();
+          });
         },
       );
       _interstitialAd!.show();

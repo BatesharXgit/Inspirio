@@ -439,7 +439,6 @@ class InspirioEditorState extends State<InspirioEditor>
   }
 
   Widget _buildTabViews() {
-    Color backgroundColour = Theme.of(context).colorScheme.background;
     Color primaryColour = Theme.of(context).colorScheme.primary;
     return TabBarView(
       controller: _tabController,

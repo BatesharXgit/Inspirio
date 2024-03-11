@@ -4,7 +4,6 @@ import 'dart:typed_data';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:iconsax/iconsax.dart';
@@ -28,7 +27,6 @@ final FirebaseStorage storage = FirebaseStorage.instance;
 late SharedPreferences _prefs;
 List<String> favoriteImages = [];
 
-late TabController _tabController;
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 final GlobalKey _globalKey = GlobalKey();
 
@@ -90,11 +88,15 @@ void _showInterstitialAd() {
     _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
       onAdDismissedFullScreenContent: (ad) {
         ad.dispose();
-        _createInterstitialAd();
+        Future.delayed(const Duration(minutes: 1), () {
+          _createInterstitialAd();
+        });
       },
       onAdFailedToShowFullScreenContent: (ad, error) {
         ad.dispose();
-        _createInterstitialAd();
+        Future.delayed(const Duration(minutes: 1), () {
+          _createInterstitialAd();
+        });
       },
     );
     _interstitialAd!.show();
@@ -140,17 +142,8 @@ class CategoryPageState extends State<CategoryPage> {
     super.initState();
     _createBannerAd();
     _createInterstitialAd();
-    _loadFavoriteImages();
-    loadNativeAd();
     categoryRef = storage.ref().child(widget.reference);
     shuffleImages();
-  }
-
-  Future<void> _loadFavoriteImages() async {
-    _prefs = await SharedPreferences.getInstance();
-    setState(() {
-      favoriteImages = _prefs.getStringList('favoriteImages') ?? [];
-    });
   }
 
   void toggleFavorite(String imageUrl) {
@@ -163,36 +156,6 @@ class CategoryPageState extends State<CategoryPage> {
     });
     _prefs.setStringList('favoriteImages', favoriteImages);
   }
-
-  NativeAd? _nativeAd;
-  bool _nativeAdIsLoaded = false;
-
-  void loadNativeAd() {
-    _nativeAd = NativeAd(
-        adUnitId: AdMobService.nativeAdsUnit!,
-        listener: NativeAdListener(
-          onAdLoaded: (ad) {
-            setState(() {
-              _nativeAdIsLoaded = true;
-            });
-          },
-          onAdFailedToLoad: (ad, error) {
-            ad.dispose();
-          },
-          onAdClicked: (ad) {},
-          onAdImpression: (ad) {},
-          onAdClosed: (ad) {},
-          onAdOpened: (ad) {},
-          onAdWillDismissScreen: (ad) {},
-          onPaidEvent: (ad, valueMicros, precision, currencyCode) {},
-        ),
-        request: const AdRequest(),
-        nativeTemplateStyle:
-            NativeTemplateStyle(templateType: TemplateType.medium),
-        customOptions: {});
-    _nativeAd?.load();
-  }
-
 
   @override
   void dispose() {
@@ -413,12 +376,13 @@ class CategoryPageState extends State<CategoryPage> {
                                       Theme.of(context).colorScheme.secondary,
                                 ),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 10,
                               ),
                               FloatingActionButton.extended(
                                 backgroundColor: backgroundColour,
                                 onPressed: () {
+                                  _showInterstitialAd();
                                   Navigator.pop(context);
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
@@ -441,7 +405,7 @@ class CategoryPageState extends State<CategoryPage> {
                                       Theme.of(context).colorScheme.secondary,
                                 ),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 10,
                               ),
                               FloatingActionButton.extended(
