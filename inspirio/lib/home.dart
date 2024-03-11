@@ -6,32 +6,38 @@ import 'package:inspirio/status/screens/home_screen.dart';
 import 'pages/category.dart';
 
 class HomePage extends ConsumerStatefulWidget {
-  const HomePage({super.key});
-  static const numOfTabs = 2;
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   ConsumerState<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
+  late final List<Widget?> _pages;
+
   int selectedPageIndex = 0;
 
-  final List<Widget> _pages = [
-    const InspirioHome(),
-    const InspirioStatusSaver(),
-    const Category(),
-    const PoetryPage(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _pages = List.generate(4, (_) => null);
+    _initializePage(0);
+  }
 
   @override
   Widget build(BuildContext context) {
     Color backgroundColour = Theme.of(context).colorScheme.background;
     Color primaryColour = Theme.of(context).colorScheme.primary;
-    Color secondaryColour = Theme.of(context).colorScheme.secondary;
     return Scaffold(
       body: IndexedStack(
         index: selectedPageIndex,
-        children: _pages,
+        children: _pages.map((page) {
+          if (page == null) {
+            return Container();
+          } else {
+            return page;
+          }
+        }).toList(),
       ),
       bottomNavigationBar: NavigationBar(
         backgroundColor: backgroundColour,
@@ -39,6 +45,9 @@ class _HomePageState extends ConsumerState<HomePage> {
         onDestinationSelected: (int index) {
           setState(() {
             selectedPageIndex = index;
+            if (_pages[index] == null) {
+              _initializePage(index);
+            }
           });
         },
         destinations: <NavigationDestination>[
@@ -68,5 +77,24 @@ class _HomePageState extends ConsumerState<HomePage> {
         ],
       ),
     );
+  }
+
+  void _initializePage(int index) {
+    switch (index) {
+      case 0:
+        _pages[index] = const InspirioHome();
+        break;
+      case 1:
+        _pages[index] = const InspirioStatusSaver();
+        break;
+      case 2:
+        _pages[index] = const Category();
+        break;
+      case 3:
+        _pages[index] = const PoetryPage();
+        break;
+      default:
+        throw Exception('Invalid index');
+    }
   }
 }

@@ -276,9 +276,7 @@ class CategoryState extends State<Category> {
         ),
       ),
       bottomNavigationBar: _banner == null
-          ? const SizedBox(
-              height: 0,
-            )
+          ? null
           : SizedBox(
               height: 52,
               child: AdWidget(ad: _banner!),

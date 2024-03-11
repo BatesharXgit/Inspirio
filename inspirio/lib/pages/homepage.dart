@@ -222,13 +222,15 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
     _prefs.setStringList('favoriteImages', favoriteImages);
   }
 
+  Map<Reference, String> cachedDownloadUrls = {};
+
   Future<void> refreshForYouImages() async {
-    final ListResult result1 = await foryouRef.listAll();
-    final List<Reference> shuffledforyourefs = result1.items.toList()
-      ..shuffle();
+    final ListResult result = await foryouRef.listAll();
+    final shuffledRefs = result.items.toList()..shuffle();
     if (mounted) {
       setState(() {
-        foryouRefs = shuffledforyourefs;
+        foryouRefs = shuffledRefs;
+        cachedDownloadUrls.clear();
       });
     }
   }
@@ -452,12 +454,9 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
   }
 
   Widget _buildForYouTab() {
-    Color backgroundColour = Theme.of(context).colorScheme.background;
-    Color primaryColour = Theme.of(context).colorScheme.primary;
-
     return RefreshIndicator(
-      backgroundColor: backgroundColour,
-      color: primaryColour,
+      backgroundColor: Theme.of(context).colorScheme.background,
+      color: Theme.of(context).colorScheme.primary,
       onRefresh: refreshForYouImages,
       child: CustomScrollView(
         physics: const ClampingScrollPhysics(),
@@ -469,22 +468,30 @@ class _InspirioHomeState extends ConsumerState<InspirioHome>
             ),
             delegate: SliverChildBuilderDelegate(
               (BuildContext context, int index) {
-                final fy = foryouRefs[index];
-                return FutureBuilder<String>(
-                  future: fy.getDownloadURL(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Components.buildPlaceholder();
-                    } else if (snapshot.hasError) {
-                      return Components.buildErrorWidget();
-                    } else if (snapshot.hasData) {
-                      return _buildImageWidget(snapshot.data!);
-                    } else {
-                      return Container();
-                    }
-                  },
-                );
+                final reference = foryouRefs[index];
+                final cachedUrl = cachedDownloadUrls[reference];
+                if (cachedUrl != null) {
+                  return _buildImageWidget(cachedUrl);
+                } else {
+                  return FutureBuilder<String>(
+                    future: reference.getDownloadURL(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Components.buildPlaceholder();
+                      } else if (snapshot.hasError) {
+                        return Components.buildErrorWidget();
+                      } else if (snapshot.hasData) {
+                        final downloadUrl = snapshot.data!;
+                        cachedDownloadUrls[reference] = downloadUrl;
+                        return _buildImageWidget(downloadUrl);
+                      } else {
+                        return Container();
+                      }
+                    },
+                  );
+                }
               },
+              childCount: foryouRefs.length,
             ),
           ),
         ],
